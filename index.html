@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DriveEase – Car Rental India</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b;
+  --bg:#f8fafc; --card:#ffffff; --line:#e2e8f0;
+  --brand:#0f4c5c; --brand2:#14687d; --brand3:#0a3640;
+  --accent:#f59e0b; --accent2:#fbbf24;
+  --ok:#059669; --bad:#dc2626;
+  --sh1:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+  --sh2:0 8px 20px rgba(15,23,42,.08),0 2px 6px rgba(15,23,42,.05);
+  --sh3:0 24px 48px rgba(15,23,42,.16),0 8px 16px rgba(15,23,42,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Inter",system-ui,-apple-system,sans-serif;color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;background:var(--bg)}
+h1,h2,h3,h4{font-family:"Plus Jakarta Sans",sans-serif;line-height:1.25;font-weight:800;margin:0}
+a{cursor:pointer;color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+.top{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:14px 5vw;position:sticky;top:0;z-index:30;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.top h1{font-size:1.25rem;display:flex;align-items:center;gap:10px;color:var(--brand);letter-spacing:-.3px}
+.top h1 b{color:var(--accent)}
+.logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:16px;background:linear-gradient(145deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 4px 12px rgba(15,76,92,.25)}
+nav{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+nav a{color:var(--ink2);padding:8px 14px;border-radius:10px;font-size:.9rem;font-weight:600;transition:all .18s}
+nav a:hover{background:#f1f5f9;color:var(--ink)}
+nav a.on{background:var(--brand);color:#fff}
+nav .who{background:#f1f5f9;padding:8px 14px;border-radius:10px;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:8px}
+nav .who i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok)}
+nav .role-badge{font-size:.68rem;background:var(--accent);color:#fff;padding:2px 7px;border-radius:99px;margin-left:4px;font-weight:700;letter-spacing:.5px}
+main{max-width:1200px;margin:0 auto;padding:26px 5vw 110px}
+.btn{border:0;color:#fff;font:inherit;font-weight:700;cursor:pointer;font-family:"Inter",sans-serif;padding:12px 22px;border-radius:12px;letter-spacing:.1px;background:var(--brand);box-shadow:0 4px 0 var(--brand3),0 8px 16px rgba(15,76,92,.2);transition:transform .12s,box-shadow .12s,filter .2s}
+.btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--brand3),0 3px 8px rgba(15,76,92,.2)}
+.btn.alt{background:var(--accent);box-shadow:0 4px 0 #b45309,0 8px 16px rgba(245,158,11,.3)}
+.btn.alt:active{box-shadow:0 1px 0 #b45309}
+.btn.red{background:var(--bad);box-shadow:0 4px 0 #991b1b,0 8px 16px rgba(220,38,38,.2)}
+.btn.red:active{box-shadow:0 1px 0 #991b1b}
+.btn.ghost{background:#fff;color:var(--brand);box-shadow:0 4px 0 var(--line),0 6px 12px rgba(15,23,42,.06);border:1px solid var(--line)}
+.btn.ghost:active{box-shadow:0 1px 0 var(--line)}
+.btn.sm{padding:8px 16px;font-size:.85rem;border-radius:10px}
+.btn:disabled{background:#cbd5e1;box-shadow:0 4px 0 #94a3b8;cursor:not-allowed;transform:none;filter:none}
+label{display:block;font-size:.82rem;margin:14px 0 6px;color:var(--muted);font-weight:600}
+input,select{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:11px;font:inherit;font-family:"Inter",sans-serif;background:#fff;color:var(--ink);transition:all .18s}
+input:focus,select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px rgba(15,76,92,.09)}
+.err{color:var(--bad);font-size:.85rem;min-height:1.15em;margin-top:8px;font-weight:600}
+.hint{font-size:.78rem;color:var(--muted);margin-top:16px;text-align:center;line-height:1.6}
+body.login .top{display:none}
+body.login main{max-width:none;padding:0}
+.lg{min-height:100vh;display:grid;grid-template-columns:1.25fr 1fr;background:#fff;overflow:hidden}
+.lg-l{padding:5vh 5vw;display:flex;flex-direction:column;justify-content:center;position:relative;background:radial-gradient(900px 500px at 70% 40%,rgba(15,76,92,.06),transparent 70%),linear-gradient(135deg,#f0f9ff 0%,#f8fafc 50%,#ecfeff 100%)}
+.lg-l::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(15,76,92,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(15,76,92,.04) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(circle at 50% 50%,#000 30%,transparent 75%)}
+.lg-l>*{position:relative;z-index:2}
+.brand{font-family:"Plus Jakarta Sans",sans-serif;font-weight:800;font-size:1.5rem;letter-spacing:-.5px;display:flex;align-items:center;gap:12px;color:var(--brand)}
+.brand b{color:var(--accent)}
+.pill{font-size:.65rem;font-weight:700;letter-spacing:1.5px;background:var(--brand);color:#fff;padding:4px 12px;border-radius:99px}
+.lg-l h2{font-size:clamp(1.9rem,3.6vw,3rem);margin:20px 0 12px;color:var(--ink);letter-spacing:-1px;line-height:1.08}
+.lg-l h2 span{color:var(--brand)}
+.lg-l p{opacity:.72;max-width:480px;margin:0;font-size:1.02rem}
+.hero-photos{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-top:32px;max-width:640px}
+.hero-photo{border-radius:18px;overflow:hidden;box-shadow:0 24px 48px rgba(15,23,42,.14);transition:transform .4s cubic-bezier(.2,.8,.3,1);aspect-ratio:16/10;background:#e2e8f0}
+.hero-photo img{width:100%;height:100%;object-fit:cover}
+.hero-photo:hover{transform:translateY(-6px) scale(1.02)}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}
+.chips span{background:#fff;padding:8px 16px;border-radius:99px;font-size:.82rem;font-weight:600;border:1.5px solid var(--line);color:var(--ink);box-shadow:var(--sh1)}
+.lg-r{display:flex;align-items:center;justify-content:center;padding:32px;background:#fff}
+.lg-card{width:100%;max-width:430px;background:#fff;color:var(--ink);border-radius:24px;padding:32px;box-shadow:0 30px 60px rgba(15,23,42,.12),0 8px 20px rgba(15,23,42,.06);border:1px solid var(--line)}
+.lg-card h3{margin:0 0 6px;font-size:1.45rem;color:var(--brand);letter-spacing:-.4px}
+.role-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:20px 0 8px}
+.role-tabs button{background:#f8fafc;border:1.5px solid var(--line);padding:12px 10px;border-radius:12px;font:inherit;font-family:"Inter",sans-serif;font-size:.85rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .18s;text-align:center}
+.role-tabs button.on{background:var(--brand);color:#fff;border-color:var(--brand);box-shadow:0 8px 16px rgba(15,76,92,.2)}
+.role-tabs button .r-icon{display:block;font-size:1.2rem;margin-bottom:2px}
+.mode-tabs{display:flex;margin:16px 0 0;border-bottom:2px solid var(--line)}
+.mode-tabs button{flex:1;background:none;border:0;padding:10px;font:inherit;font-family:"Plus Jakarta Sans",sans-serif;font-size:.9rem;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;font-weight:700;transition:all .18s}
+.mode-tabs button.on{color:var(--brand);border-color:var(--accent)}
+.demo-box{background:linear-gradient(135deg,#f0f9ff,#ecfeff);border:1.5px dashed #a5d8e6;border-radius:12px;padding:12px 14px;margin-top:16px;font-size:.78rem}
+.demo-box b{color:var(--brand);display:block;margin-bottom:6px;font-size:.72rem;letter-spacing:.5px}
+.demo-box code{background:#fff;padding:3px 8px;border-radius:6px;color:var(--brand);font-weight:700;font-size:.75rem;display:inline-block;margin:2px 0}
+.chk{display:flex;gap:9px;align-items:center;margin:12px 0;font-size:.88rem;color:var(--ink);font-weight:500}
+.chk input{width:auto;accent-color:var(--brand)}
+.page-hero{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center;background:linear-gradient(135deg,#0a3640,#0f4c5c 55%,#14687d);border-radius:24px;padding:36px 44px;margin-bottom:28px;color:#fff;overflow:hidden;position:relative;box-shadow:0 24px 48px rgba(15,76,92,.25)}
+.page-hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(700px circle at 82% 22%,rgba(255,255,255,.1),transparent 60%)}
+.page-hero>*{position:relative;z-index:2}
+.eyebrow{font-size:.72rem;letter-spacing:2.5px;text-transform:uppercase;opacity:.7;font-weight:700;font-family:"Plus Jakarta Sans",sans-serif}
+.page-hero h2{font-size:clamp(1.6rem,2.8vw,2.3rem);margin:12px 0 12px;color:#fff;letter-spacing:-.5px}
+.page-hero p{margin:0;opacity:.85;max-width:520px;font-size:.98rem}
+.hero-img{aspect-ratio:16/10;border-radius:18px;overflow:hidden;box-shadow:0 24px 40px rgba(0,0,0,.3)}
+.hero-img img{width:100%;height:100%;object-fit:cover}
+.filters-bar{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:12px;background:#fff;padding:14px;border-radius:16px;border:1px solid var(--line);box-shadow:var(--sh1);margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:24px;padding:4px 0 12px}
+.car{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--sh1);transition:transform .3s cubic-bezier(.2,.8,.3,1),box-shadow .3s;position:relative}
+.car:hover{transform:translateY(-6px);box-shadow:var(--sh2);border-color:rgba(15,76,92,.15)}
+.car-img{position:relative;aspect-ratio:16/10;background:#e2e8f0;overflow:hidden}
+.car-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.2,.8,.3,1)}
+.car:hover .car-img img{transform:scale(1.06)}
+.badge-new{position:absolute;top:12px;left:12px;background:var(--accent);color:#fff;font-size:.68rem;font-weight:800;letter-spacing:1px;padding:4px 10px;border-radius:99px;box-shadow:0 4px 10px rgba(245,158,11,.4)}
+.badge-avail{position:absolute;top:12px;right:12px;font-size:.7rem;font-weight:700;padding:4px 10px;border-radius:99px;backdrop-filter:blur(6px)}
+.badge-avail.ok{background:rgba(5,150,105,.92);color:#fff}
+.badge-avail.bad{background:rgba(220,38,38,.92);color:#fff}
+.car-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.car-title-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.car-title-row h3{font-size:1.05rem;color:var(--ink);letter-spacing:-.2px;line-height:1.3}
+.car-year{font-size:.72rem;font-weight:700;background:#f1f5f9;color:var(--ink2);padding:3px 9px;border-radius:99px;white-space:nowrap}
+.rate{font-size:.75rem;font-weight:700;color:#b45309;background:#fffbeb;border:1px solid #fde68a;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.meta{color:var(--muted);font-size:.83rem;display:flex;flex-wrap:wrap;gap:6px}
+.meta .sep{opacity:.4}
+.price-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+.price{font-size:1.35rem;font-weight:800;color:var(--brand);font-family:"Plus Jakarta Sans",sans-serif;letter-spacing:-.5px}
+.price small{font-weight:500;color:var(--muted);font-size:.72rem}
+.cmp-row{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:.8rem;color:var(--muted);font-weight:600}
+.cmp-row input{width:auto;accent-color:var(--brand);cursor:pointer}
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)}
+.info-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #fcd34d;border-radius:16px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.info-banner .icon{font-size:1.6rem}
+.info-banner .text{flex:1;min-width:200px}
+.info-banner b{color:#92400e;display:block;font-size:.92rem}
+.info-banner span{color:#78350f;font-size:.85rem}
+.info-banner .btn{background:#92400e;box-shadow:0 4px 0 #451a03,0 8px 16px rgba(146,64,14,.3);padding:9px 18px;font-size:.85rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:24px;box-shadow:var(--sh1)}
+.panel h3{margin-top:0;color:var(--brand)}
+.wrap{overflow-x:auto;border-radius:14px;box-shadow:var(--sh1);border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;background:var(--card);min-width:640px}
+th,td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line);font-size:.87rem;vertical-align:middle}
+th{background:#f8fafc;font-size:.72rem;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);font-weight:700}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#f8fafc}
+.best{background:#ecfdf5;font-weight:800;color:#065f46}
+.tag{font-size:.72rem;padding:3px 9px;border-radius:99px;background:#ecfdf5;color:var(--ok);font-weight:700;display:inline-block}
+.tag.bad{background:#fef2f2;color:var(--bad)}
+.tag.warn{background:#fffbeb;color:#b45309}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+.stat{border-radius:18px;padding:22px;color:#fff;background:linear-gradient(145deg,var(--brand),var(--brand2));box-shadow:0 12px 24px rgba(15,76,92,.18)}
+.stat:nth-child(2){background:linear-gradient(145deg,#059669,#10b981);box-shadow:0 12px 24px rgba(5,150,105,.2)}
+.stat:nth-child(3){background:linear-gradient(145deg,#d97706,#f59e0b);box-shadow:0 12px 24px rgba(217,119,6,.2)}
+.stat:nth-child(4){background:linear-gradient(145deg,#7c3aed,#8b5cf6);box-shadow:0 12px 24px rgba(124,58,237,.2)}
+.stat b{font-size:1.7rem;display:block;line-height:1.15;font-family:"Plus Jakarta Sans",sans-serif}
+.stat span{font-size:.82rem;opacity:.92;font-weight:500}
+.modal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.58);backdrop-filter:blur(8px);animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.modal .box{background:#fff;border-radius:22px;padding:28px;width:100%;max-width:560px;max-height:92vh;overflow:auto;box-shadow:var(--sh3);animation:pop .35s cubic-bezier(.2,.9,.3,1.15)}
+.modal .box.wide{max-width:840px}
+@keyframes pop{from{transform:translateY(24px) scale(.96);opacity:0}}
+.modal h2{margin:0 0 8px;font-size:1.35rem;color:var(--brand);letter-spacing:-.3px}
+.sum{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:16px;font-size:.9rem}
+.sum div{display:flex;justify-content:space-between;padding:5px 0}
+.sum div:last-child{border-top:1px dashed var(--line);margin-top:8px;padding-top:10px;font-size:1.05rem;font-weight:800;color:var(--brand)}
+.steps{display:flex;gap:8px;margin-bottom:18px;font-size:.74rem;font-weight:700}
+.steps span{flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:#f1f5f9;color:var(--muted)}
+.steps span.on{background:var(--brand);color:#fff}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.bk-head{display:flex;gap:18px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.bk-pic{width:180px;flex:0 0 auto;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#e2e8f0}
+.bk-pic img{width:100%;height:100%;object-fit:cover}
+.ok{font-size:3rem;text-align:center;color:var(--ok);line-height:1}
+.spin{width:48px;height:48px;border:5px solid #e2e8f0;border-top-color:var(--brand);border-radius:50%;animation:r 1s linear infinite;margin:26px auto}
+@keyframes r{to{transform:rotate(360deg)}}
+.pay-info{background:linear-gradient(135deg,#ecfeff,#f0f9ff);border:1.5px solid #a5d8e6;border-radius:14px;padding:14px 16px;margin-bottom:16px;font-size:.85rem;color:#0e4a56}
+.pay-info b{color:var(--brand);display:block;margin-bottom:4px}
+.cmpbar{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:35;background:var(--brand);color:#fff;padding:12px 22px;border-radius:99px;display:flex;gap:16px;align-items:center;box-shadow:0 20px 40px rgba(15,76,92,.35);font-size:.9rem;font-weight:600;animation:pop .3s}
+#toast{position:fixed;bottom:24px;left:50%;z-index:90;padding:14px 24px;border-radius:14px;font-weight:600;font-size:.9rem;background:var(--brand);color:#fff;box-shadow:var(--sh3);transform:translateX(-50%) translateY(120px);opacity:0;transition:transform .3s,opacity .3s;pointer-events:none}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ===== v2 UI upgrade ===== */
+body{background:radial-gradient(900px 500px at 90% -5%,rgba(20,104,125,.10),transparent 60%),var(--bg)}
+.filters-bar{position:sticky;top:72px;z-index:20;box-shadow:var(--sh2)}
+.grid{display:flex;flex-direction:column;gap:28px;padding:6px 0 12px}
+.car{flex-direction:row;border-radius:26px;min-height:300px;box-shadow:var(--sh2)}
+.car-img{flex:0 0 54%;aspect-ratio:auto;min-height:300px}
+.car-img::after{content:"";position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(transparent,rgba(10,54,64,.55));pointer-events:none}
+.badge-new{z-index:2;top:18px;left:18px;font-size:.75rem;padding:6px 14px}
+.car-body{padding:30px 34px;gap:14px;justify-content:center}
+.car-title-row h3{font-size:1.7rem;letter-spacing:-.6px}
+.rate{font-size:.9rem;padding:4px 12px}
+.car-year{align-self:flex-start;font-size:.8rem}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0}
+.spec{display:flex;align-items:center;gap:10px;background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:.86rem;font-weight:600;color:var(--ink2)}
+.spec i{font-style:normal;font-size:1.15rem}
+.price{font-size:2rem}
+.car .btn{padding:14px 32px;font-size:1rem}
+.swift-hero{position:relative;margin-top:30px;max-width:640px;border-radius:26px;overflow:hidden;aspect-ratio:16/10;background:#e2e8f0;box-shadow:0 34px 64px rgba(15,23,42,.25)}
+.swift-hero img{width:100%;height:100%;object-fit:cover;animation:slowzoom 14s ease-in-out infinite alternate}
+@keyframes slowzoom{to{transform:scale(1.08)}}
+.swift-tag{position:absolute;left:18px;bottom:18px;background:rgba(15,23,42,.8);color:#fff;padding:9px 16px;border-radius:99px;font-size:.88rem;font-weight:700;backdrop-filter:blur(6px)}
+@media(max-width:820px){.car{flex-direction:column}.car-img{flex:none;min-height:0;aspect-ratio:16/10}.car-body{padding:22px}.filters-bar{position:static}}
+
+/* ===== v3 NEON NIGHT THEME ===== */
+:root{--ink:#eef2ff;--ink2:#b6c0d6;--muted:#8b97b1;--bg:#06080f;--card:#0d1220;--line:rgba(255,255,255,.09);
+--brand:#ff5a1f;--brand2:#ff8a3d;--brand3:#a3320a;--accent:#22d3ee;--accent2:#67e8f9;
+--sh1:0 1px 2px rgba(0,0,0,.5);--sh2:0 18px 40px rgba(0,0,0,.45);--sh3:0 30px 80px rgba(0,0,0,.65)}
+body{background:var(--bg);color:var(--ink)}
+body::before,body::after{content:"";position:fixed;z-index:-1;width:60vmax;height:60vmax;border-radius:50%;filter:blur(120px);opacity:.33;pointer-events:none;animation:drift 22s ease-in-out infinite alternate}
+body::before{background:#ff5a1f;top:-30vmax;left:-20vmax}
+body::after{background:#0891b2;bottom:-35vmax;right:-25vmax;animation-delay:-9s}
+@keyframes drift{to{transform:translate(12vw,10vh) scale(1.2)}}
+@keyframes rise{from{opacity:0;transform:translateY(26px)}}
+@keyframes floaty{50%{transform:translateY(-10px)}}
+#app>*{animation:rise .7s cubic-bezier(.2,.8,.3,1) backwards}
+.top{background:rgba(8,11,20,.72);border-bottom:1px solid var(--line)}
+.top h1{color:#fff}.top h1 b{color:var(--brand)}
+nav a{color:var(--ink2)}nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+nav a.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 0 24px rgba(255,90,31,.5)}
+nav .who{background:rgba(255,255,255,.07);color:var(--ink)}
+nav .role-badge{background:var(--accent);color:#042f3a}
+.btn{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 4px 0 var(--brand3),0 12px 30px rgba(255,90,31,.35)}
+.btn:active{box-shadow:0 1px 0 var(--brand3)}
+.btn::after{content:"";position:absolute;top:0;left:-70%;width:50%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-20deg);transition:left .6s}
+.btn:hover::after{left:130%}
+.btn.alt{background:linear-gradient(135deg,#06b6d4,#22d3ee);color:#042f3a;box-shadow:0 4px 0 #0e7490,0 12px 30px rgba(34,211,238,.3)}
+.btn.ghost{background:rgba(255,255,255,.06);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn.red{background:linear-gradient(135deg,#dc2626,#f43f5e)}
+.btn:disabled{background:#273044;color:#8b97b1;box-shadow:none}
+input,select{background:rgba(255,255,255,.05);color:var(--ink);border-color:var(--line)}
+input::placeholder{color:#64748b}
+input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(255,90,31,.18)}
+select option{background:#0d1220;color:#eef2ff}
+input[type=date]{color-scheme:dark}
+.chk{color:var(--ink2)}
+/* login */
+.lg,.lg-r{background:transparent}
+.lg-l{background:radial-gradient(800px 500px at 30% 40%,rgba(255,90,31,.2),transparent 70%),linear-gradient(135deg,#0a0f1c,#06080f)}
+.lg-l::before{background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px)}
+.lg-l>.wm{position:absolute;z-index:0;right:-2vw;bottom:1vh;font:800 clamp(6rem,17vw,16rem)/1 "Plus Jakarta Sans",sans-serif;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.08);letter-spacing:-.05em;pointer-events:none}
+.lg-l>.road{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.road i{position:absolute;height:2px;width:30vw;left:-35vw;opacity:.85;background:linear-gradient(90deg,transparent,var(--brand),transparent);animation:zoomx 3.2s linear infinite}
+.road i:nth-child(1){top:18%}
+.road i:nth-child(2){top:42%;animation-delay:-1.1s;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.road i:nth-child(3){top:66%;animation-delay:-2s}
+.road i:nth-child(4){top:84%;animation-delay:-.5s;width:20vw;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+@keyframes zoomx{to{transform:translateX(150vw)}}
+.brand{color:#fff}.brand b{color:var(--brand)}
+.pill{background:linear-gradient(135deg,var(--brand),var(--brand2))}
+.lg-l h2{color:#fff}
+.lg-l h2 span,.page-hero h2{background:linear-gradient(90deg,var(--brand2),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lg-l p{opacity:1;color:var(--ink2)}
+.chips span{background:rgba(255,255,255,.06);color:var(--ink);border-color:var(--line);backdrop-filter:blur(6px)}
+.lg-r{background:#080b14}
+.lg-card{background:rgba(255,255,255,.04);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 70px rgba(255,90,31,.13)}
+.lg-card h3{color:#fff}
+.role-tabs button{background:rgba(255,255,255,.05);color:var(--ink2);border-color:var(--line)}
+.role-tabs button.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-color:transparent;box-shadow:0 0 28px rgba(255,90,31,.45)}
+.mode-tabs button.on{color:#fff;border-color:var(--brand)}
+.demo-box{background:rgba(34,211,238,.07);border-color:rgba(34,211,238,.35);color:var(--ink2)}
+.demo-box b{color:var(--accent2)}
+.demo-box code{background:rgba(255,255,255,.08);color:var(--accent2)}
+.swift-hero{box-shadow:0 40px 90px rgba(255,90,31,.3),0 0 0 1px rgba(255,255,255,.12);animation:floaty 6s ease-in-out infinite}
+.swift-tag{background:linear-gradient(135deg,var(--brand),var(--brand2))}
+/* hero + banner + marquee + filters */
+.page-hero{background:linear-gradient(120deg,rgba(255,90,31,.25),rgba(8,145,178,.2) 60%,rgba(13,18,32,.9)),#0d1220;border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 80px rgba(0,0,0,.55)}
+.page-hero h2{font-size:clamp(2rem,4vw,3.3rem);letter-spacing:-1.5px}
+.hero-img{border:1px solid rgba(255,255,255,.18);box-shadow:0 30px 70px rgba(255,90,31,.35);animation:floaty 7s ease-in-out infinite}
+.marquee{overflow:hidden;margin:0 0 24px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.marquee div{display:flex;gap:40px;width:max-content;animation:mq 30s linear infinite;font:800 1.5rem "Plus Jakarta Sans",sans-serif;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.3);letter-spacing:3px;text-transform:uppercase}
+@keyframes mq{to{transform:translateX(-50%)}}
+.info-banner{background:linear-gradient(135deg,rgba(255,90,31,.16),rgba(34,211,238,.08));border-color:rgba(255,138,61,.35)}
+.info-banner b{color:#ffd2b8}.info-banner span{color:var(--ink2)}
+.info-banner .btn{background:linear-gradient(135deg,var(--brand),var(--brand2));box-shadow:0 4px 0 var(--brand3)}
+.filters-bar{background:rgba(13,18,32,.82);backdrop-filter:blur(16px);border-color:var(--line)}
+/* car cards */
+.car{background:linear-gradient(160deg,#121a36,#0a0f1f);border:1px solid var(--line)}
+.car:hover{border-color:rgba(255,106,44,.6);box-shadow:0 30px 70px rgba(0,0,0,.6),0 0 60px rgba(255,90,31,.2)}
+.car::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:0;transition:opacity .3s;background:radial-gradient(520px circle at var(--mx,50%) var(--my,50%),rgba(255,106,44,.18),transparent 45%)}
+.car:hover::after{opacity:1}
+.car-img{background:#111827}
+.car-img::before{content:"";position:absolute;top:0;left:-80%;width:50%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.3),transparent);transform:skewX(-20deg);z-index:1;transition:left .9s;pointer-events:none}
+.car:hover .car-img::before{left:140%}
+.badge-new{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+.car-title-row h3{color:#fff}
+.car-year{background:rgba(255,255,255,.08);color:var(--ink2)}
+.rate{background:rgba(255,184,0,.12);border-color:rgba(255,184,0,.4);color:#ffc857}
+.spec{background:rgba(255,255,255,.05);border-color:var(--line);color:var(--ink)}
+.price{background:linear-gradient(90deg,#fff,var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.price small{color:var(--muted);-webkit-text-fill-color:var(--muted)}
+.cmp-row{color:var(--ink2)}
+.rv .car,.rv .stat,.rv .panel{opacity:0;translate:0 50px;transition:opacity .8s cubic-bezier(.2,.8,.3,1),translate .8s cubic-bezier(.2,.8,.3,1),border-color .3s,box-shadow .3s}
+.rv .car.in,.rv .stat.in,.rv .panel.in{opacity:1;translate:0 0}
+/* modals, tables, misc */
+.modal .box{background:#0e1424;border:1px solid var(--line);color:var(--ink)}
+.modal h2{color:#fff}
+.modal code{background:rgba(255,255,255,.1)!important;color:var(--accent2)}
+.sum{background:rgba(255,255,255,.04);border-color:var(--line)}
+.sum div:last-child{color:var(--brand2)}
+.steps span{background:rgba(255,255,255,.06)}
+.steps span.on{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
+.pay-info{background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.3);color:var(--ink2)}
+.pay-info b{color:var(--accent2)}
+.bk-pic{background:#111827}
+.spin{border-color:rgba(255,255,255,.12);border-top-color:var(--brand)}
+.wrap{border-color:var(--line)}
+th{background:rgba(255,255,255,.04)}
+tbody tr:hover{background:rgba(255,255,255,.04)}
+.best{background:rgba(5,150,105,.2);color:#6ee7b7}
+.tag{background:rgba(16,185,129,.15);color:#6ee7b7}
+.tag.bad{background:rgba(239,68,68,.16);color:#fca5a5}
+.tag.warn{background:rgba(245,158,11,.16);color:#fcd34d}
+.cmpbar{background:linear-gradient(135deg,var(--brand),var(--brand2))}
+#toast{background:#111827;border:1px solid var(--brand);color:#fff}
+@media print{.modal .box{background:#fff!important;color:#000!important}.modal .box *{color:#000!important;-webkit-text-fill-color:#000!important}}
+@media(max-width:960px){.lg{grid-template-columns:1fr}.page-hero{grid-template-columns:1fr}.filters-bar{grid-template-columns:1fr 1fr}.hero-photos{grid-template-columns:1fr}}
+@media(max-width:620px){.filters-bar{grid-template-columns:1fr}}
+@media print{body *{visibility:hidden!important}.modal,.modal *{visibility:visible!important}.modal{position:absolute;inset:0;background:#fff;display:block;padding:0}.modal .box{box-shadow:none;max-width:none;animation:none;border-radius:0}.btn{display:none!important}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1><span class="logo">🚗</span> Drive<b>Ease</b></h1>
+  <nav id="nav"></nav>
+</header>
+<main id="app"></main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const inr = n => '₹' + Math.round(n).toLocaleString('en-IN');
+const today = () => new Date().toISOString().slice(0, 10);
+const addDays = (d, n) => { const x = new Date(d + 'T00:00:00'); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+const days = (a, b) => Math.max(1, Math.round((new Date(b) - new Date(a)) / 864e5) + 1);
+const overlap = (s, e, a, b) => s <= b && e >= a;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* =========================================================
+   ☁️ CLOUD DATABASE — Supabase (PostgreSQL)
+   URLs/keys are injected by the GitHub Actions pipeline
+   (repository secrets SUPABASE_URL / SUPABASE_ANON_KEY).
+   The anon key is public by design; Row Level Security
+   in the database decides who can read or write what.
+   ========================================================= */
+const SUPABASE_URL = '__SUPABASE_URL__';
+const SUPABASE_KEY = '__SUPABASE_ANON_KEY__';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let SESSION = null;                 // logged-in user {id,name,email,role}
+const CACHE = {};                   // in-memory copy of cloud tables
+const SNAP  = {};                   // last-synced snapshot, used to diff writes
+const REMOTE = { 'driveease_cars_v3':'cars', 'driveease_bookings_v3':'bookings', 'driveease_users_v3':null };
+const isStub = r => String(r.id).startsWith('slot_');
+
+const carFrom = r => ({ id:r.id, name:r.name, type:r.type, seats:r.seats, fuel:r.fuel, price:r.price, year:r.year,
+  rating:Number(r.rating), trans:r.trans, mileage:r.mileage, isNew:r.is_new,
+  photo:r.photo || photoFor(r.name, r.type),
+  maint:(r.maint_from && r.maint_to) ? { from:r.maint_from, to:r.maint_to } : null });
+const carTo = c => ({ id:c.id, name:c.name, type:c.type, seats:c.seats, fuel:c.fuel, price:c.price, year:c.year,
+  rating:c.rating, trans:c.trans, mileage:c.mileage, is_new:!!c.isNew, photo:c.photo || null,
+  maint_from:c.maint ? c.maint.from : null, maint_to:c.maint ? c.maint.to : null });
+const bookFrom = r => ({ id:r.id, carId:r.car_id, carName:r.car_name, carType:r.car_type, carYear:r.car_year, carPhoto:r.car_photo,
+  userId:r.user_id, userEmail:r.user_email, userName:r.user_name, start:r.start_date, end:r.end_date, days:r.days,
+  addons:r.addons, coupon:r.coupon, base:Number(r.base), weekly:Number(r.weekly), couponAmt:Number(r.coupon_amt),
+  addonAmt:Number(r.addon_amt), gst:Number(r.gst), total:Number(r.total), payment:r.payment, txn:r.txn,
+  status:r.status, paidOn:r.paid_on });
+const bookTo = b => ({ id:b.id, car_id:b.carId, car_name:b.carName, car_type:b.carType, car_year:b.carYear, car_photo:b.carPhoto,
+  user_id:b.userId || (SESSION && SESSION.id), user_email:b.userEmail, user_name:b.userName,
+  start_date:b.start, end_date:b.end, days:b.days, addons:b.addons || [], coupon:b.coupon || '',
+  base:b.base, weekly:b.weekly, coupon_amt:b.couponAmt, addon_amt:b.addonAmt, gst:b.gst, total:b.total,
+  payment:b.payment, txn:b.txn, status:b.status, paid_on:b.paidOn });
+const TO_ROW = { cars:carTo, bookings:bookTo };
+
+let WRITE_Q = Promise.resolve();
+function syncKey(k, arr) {
+  const table = REMOTE[k]; if (!table) return;
+  const prev = SNAP[k] || new Map(), next = new Map(), ops = [];
+  for (const r of arr) {
+    if (isStub(r)) continue;
+    const str = JSON.stringify(r); next.set(String(r.id), str);
+    if (!prev.has(String(r.id))) ops.push(() => sb.from(table).insert(TO_ROW[table](r)));
+    else if (prev.get(String(r.id)) !== str) { const row = TO_ROW[table](r); delete row.id; ops.push(() => sb.from(table).update(row).eq('id', r.id)); }
+  }
+  for (const id of prev.keys()) if (!next.has(id)) ops.push(() => sb.from(table).delete().eq('id', id));
+  SNAP[k] = next;
+  ops.forEach(op => { WRITE_Q = WRITE_Q.then(async () => {
+    const { error } = await op();
+    if (error) { toast('Save failed: ' + error.message); await loadData(); render(); }
+  }); });
+}
+
+async function loadData() {
+  const admin = SESSION && SESSION.role === 'admin';
+  const [cars, books, profs, slots] = await Promise.all([
+    sb.from('cars').select('*').order('id'),
+    sb.from('bookings').select('*').order('created_at'),
+    sb.from('profiles').select('id,name,email,role'),
+    admin ? Promise.resolve({ data: [] }) : sb.rpc('booked_slots')
+  ]);
+  const err = cars.error || books.error || profs.error || slots.error;
+  if (err) { toast('Database error: ' + err.message); return; }
+  CACHE['driveease_cars_v3'] = cars.data.map(carFrom);
+  const own = books.data.map(bookFrom), ownIds = new Set(own.map(b => b.id));
+  const stubs = (slots.data || []).filter(x => !ownIds.has(x.id))
+    .map(x => ({ id:'slot_' + x.id, carId:x.car_id, start:x.start_date, end:x.end_date, status:'confirmed', userEmail:null }));
+  CACHE['driveease_bookings_v3'] = own.concat(stubs);
+  CACHE['driveease_users_v3'] = profs.data;
+  SNAP['driveease_cars_v3'] = new Map(CACHE['driveease_cars_v3'].map(r => [String(r.id), JSON.stringify(r)]));
+  SNAP['driveease_bookings_v3'] = new Map(own.map(r => [String(r.id), JSON.stringify(r)]));
+}
+
+async function addBooking(rec) {
+  const { error } = await sb.from('bookings').insert(bookTo(rec));
+  if (error) return error;
+  CACHE['driveease_bookings_v3'].push(rec);
+  SNAP['driveease_bookings_v3'].set(String(rec.id), JSON.stringify(rec));
+  return null;
+}
+
+const db = {
+  get(k, d) {
+    if (k in REMOTE) return CACHE[k] || [];
+    try { const v = JSON.parse(localStorage.getItem(k)); return v === null || v === undefined ? d : v; } catch { return d; }
+  },
+  set(k, v) {
+    if (k in REMOTE) { CACHE[k] = v; syncKey(k, v); return; }
+    localStorage.setItem(k, JSON.stringify(v));
+  }
+};
+
+/* =========================================================
+   📷 REAL CAR PHOTOS — curated direct Unsplash CDN links
+   Every URL is permanent, free, and matched by body type.
+   To swap a photo, just replace the URL in PHOTO_LIB below.
+   ========================================================= */
+const PHOTO_LIB = {
+  // ---- SUVs ----
+  suvRed:      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80&auto=format&fit=crop',
+  suvDark:     'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=800&q=80&auto=format&fit=crop',
+  suvWhite:    'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&q=80&auto=format&fit=crop',
+  suvSilver:   'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&q=80&auto=format&fit=crop',
+  suvBlue:     'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&q=80&auto=format&fit=crop',
+  suvBlack:    'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80&auto=format&fit=crop',
+  suvOffroad:  'https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?w=800&q=80&auto=format&fit=crop',
+  suvCompact:  'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&q=80&auto=format&fit=crop',
+
+  // ---- Sedans ----
+  sedanRed:    'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=800&q=80&auto=format&fit=crop',
+  sedanBlue:   'https://images.unsplash.com/photo-1550355291-bbee04a92027?w=800&q=80&auto=format&fit=crop',
+  sedanBlack:  'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&q=80&auto=format&fit=crop',
+  sedanWhite:  'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80&auto=format&fit=crop',
+  sedanSilver: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80&auto=format&fit=crop',
+  sedanGrey:   'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80&auto=format&fit=crop',
+
+  // ---- Hatchbacks ----
+  hatchRed:    'https://images.unsplash.com/photo-1541443131876-44b03de101c5?w=800&q=80&auto=format&fit=crop',
+  hatchBlue:   'https://images.unsplash.com/photo-1471444928139-48c5bf5173f8?w=800&q=80&auto=format&fit=crop',
+  hatchWhite:  'https://images.unsplash.com/photo-1493238792000-8113da705763?w=800&q=80&auto=format&fit=crop',
+  hatchSilver: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&q=80&auto=format&fit=crop',
+
+  // ---- EVs ----
+  evWhite:     'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&q=80&auto=format&fit=crop',
+  evBlue:      'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=800&q=80&auto=format&fit=crop',
+
+  // ---- MUVs ----
+  muvWhite:    'https://images.unsplash.com/photo-1533106418989-88406c7cc8ca?w=800&q=80&auto=format&fit=crop',
+  muvSilver:   'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&q=80&auto=format&fit=crop',
+
+  // ---- Generic fallback ----
+  generic:     'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80&auto=format&fit=crop'
+};
+
+/* Assign the best-fit photo to each car in the fleet */
+const PHOTO_BY_NAME = {
+  // Latest 2024-25
+  'Tata Curvv':              PHOTO_LIB.suvBlue,
+  'Mahindra Thar Roxx':      PHOTO_LIB.suvOffroad,
+  'Tata Nexon 2024':         PHOTO_LIB.suvRed,
+  'Hyundai Creta 2024':      PHOTO_LIB.suvWhite,
+  'Maruti Swift 2024':       PHOTO_LIB.hatchRed,
+  'Maruti Fronx':            PHOTO_LIB.suvCompact,
+  'Mahindra XUV 3XO':        PHOTO_LIB.suvDark,
+  'Hyundai Exter':           PHOTO_LIB.suvSilver,
+  'Tata Punch':              PHOTO_LIB.suvCompact,
+  'Honda Elevate':           PHOTO_LIB.suvWhite,
+  // Previous
+  'Hyundai Creta 2022':      PHOTO_LIB.suvBlack,
+  'Kia Seltos':              PHOTO_LIB.suvDark,
+  'Kia Sonet':               PHOTO_LIB.suvSilver,
+  'Honda City':              PHOTO_LIB.sedanBlue,
+  'Hyundai Verna':           PHOTO_LIB.sedanRed,
+  'Skoda Slavia':            PHOTO_LIB.sedanBlack,
+  'Tata Altroz':             PHOTO_LIB.hatchSilver,
+  'Maruti Baleno':           PHOTO_LIB.hatchBlue,
+  'Tata Harrier':            PHOTO_LIB.suvBlack,
+  'Mahindra XUV700':         PHOTO_LIB.suvDark,
+  'Mahindra Thar':           PHOTO_LIB.suvOffroad,
+  'Toyota Innova Crysta':    PHOTO_LIB.muvWhite,
+  'Maruti Ertiga':           PHOTO_LIB.muvSilver,
+  'Tata Nexon EV':           PHOTO_LIB.evWhite,
+  'Toyota Fortuner':         PHOTO_LIB.suvWhite
+};
+
+function photoFor(name, type) {
+  if (PHOTO_BY_NAME[name]) return PHOTO_BY_NAME[name];
+  const t = String(type || '');
+  if (/Electric/i.test(t)) return PHOTO_LIB.evWhite;
+  if (/MUV/i.test(t))      return PHOTO_LIB.muvWhite;
+  if (/SUV/i.test(t))      return PHOTO_LIB.suvWhite;
+  if (/Sedan/i.test(t))    return PHOTO_LIB.sedanBlue;
+  if (/Hatch/i.test(t))    return PHOTO_LIB.hatchRed;
+  return PHOTO_LIB.generic;
+}
+
+/* ✏️ WANT A SPECIFIC PHOTO? Paste its direct image URL here, e.g.  'Tata Curvv':'https://…/curvv.jpg'  */
+const MY_PHOTOS = {};
+
+/* Search phrase used to find each model's real photos */
+const CAR_Q = {
+  'Tata Curvv':'Tata Curvv','Mahindra Thar Roxx':'Mahindra Thar Roxx','Tata Nexon 2024':'Tata Nexon facelift',
+  'Hyundai Creta 2024':'Hyundai Creta 2024','Maruti Swift 2024':'Maruti Suzuki Swift 2024','Maruti Fronx':'Maruti Suzuki Fronx',
+  'Mahindra XUV 3XO':'Mahindra XUV 3XO','Hyundai Exter':'Hyundai Exter','Tata Punch':'Tata Punch','Honda Elevate':'Honda Elevate',
+  'Hyundai Creta 2022':'Hyundai Creta 2022','Kia Seltos':'Kia Seltos','Kia Sonet':'Kia Sonet','Honda City':'Honda City India',
+  'Hyundai Verna':'Hyundai Verna','Skoda Slavia':'Skoda Slavia','Tata Altroz':'Tata Altroz','Maruti Baleno':'Maruti Suzuki Baleno',
+  'Tata Harrier':'Tata Harrier','Mahindra XUV700':'Mahindra XUV700','Mahindra Thar':'Mahindra Thar',
+  'Toyota Innova Crysta':'Toyota Innova Crysta','Maruti Ertiga':'Maruti Suzuki Ertiga','Tata Nexon EV':'Tata Nexon EV',
+  'Toyota Fortuner':'Toyota Fortuner'
+};
+const BAD_WORDS = /interior|dashboard|cockpit|engine|logo|badge|emblem|seat|wheel|headlamp|headlight|tail ?lamp|taillight|steering|console|infotainment|brochure|poster|drawing|diagram|cutaway|boot|trunk|spy|camouflag|mule/i;
+const SKIP_WORD = /^(tata|mahindra|hyundai|kia|honda|maruti|suzuki|toyota|skoda|škoda|india|facelift|\d{4})$/i;
+const NOT_IN_TITLE = { 'Mahindra Thar':/roxx/i, 'Tata Nexon 2024':/\bev\b|electric/i };
+let PICS = db.get('driveease_pics_v2', {});
+const usedPics = new Set(Object.values(PICS));
+
+/* alt text = car name, so the real photo is looked up by name */
+function imgTag(src, alt) {
+  const fb = PHOTO_LIB.generic;
+  return `<img src="${MY_PHOTOS[alt] || PICS[alt] || src}" data-car="${esc(alt)}" alt="${esc(alt)}" loading="lazy" decoding="async"
+    onerror="if(this.dataset.f!=='1'){this.dataset.f='1';this.src='${src}'}else{this.onerror=null;this.src='${fb}'}">`;
+}
+
+/* Best photo: a landscape, exterior JPEG whose file name contains the model name */
+async function findPhoto(name) {
+  const q = CAR_Q[name] || name;
+  const need = q.split(/\s+/).filter(w => !SKIP_WORD.test(w)).map(w => w.toLowerCase());
+  const url = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=30&gsrsearch=' +
+    encodeURIComponent(q) + '&prop=imageinfo&iiprop=url|size|mime&iiurlwidth=1100';
+  const r = await fetch(url);
+  if (!r.ok) return null;
+  const j = await r.json();
+  const pages = Object.values((j.query && j.query.pages) || {}).sort((a, b) => a.index - b.index);
+  for (const p of pages) {
+    const i = p.imageinfo && p.imageinfo[0];
+    if (!i || i.mime !== 'image/jpeg' || i.width < 1100) continue;
+    const ratio = i.width / i.height;
+    if (ratio < 1.3 || ratio > 2.1) continue;
+    const t = p.title.toLowerCase();
+    if (BAD_WORDS.test(t) || !need.every(w => t.includes(w))) continue;
+    if (NOT_IN_TITLE[name] && NOT_IN_TITLE[name].test(t)) continue;
+    if (usedPics.has(i.thumburl)) continue;
+    return i.thumburl;
+  }
+  return null;
+}
+
+/* Fallback: lead picture of the model's Wikipedia article */
+async function wikiPhoto(name) {
+  const r = await fetch('https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrlimit=1&gsrsearch=' +
+    encodeURIComponent(CAR_Q[name] || name) + '&prop=pageimages&pithumbsize=1000');
+  if (!r.ok) return null;
+  const j = await r.json();
+  const p = Object.values((j.query && j.query.pages) || {})[0];
+  return p && p.thumbnail ? p.thumbnail.source : null;
+}
+
+async function loadPics() {
+  const names = Object.keys(CAR_Q).filter(n => !PICS[n]);
+  for (let i = 0; i < names.length; i += 4) {
+    await Promise.all(names.slice(i, i + 4).map(async n => {
+      let u = null;
+      try { u = (await findPhoto(n)) || (await wikiPhoto(n)); } catch (e) { /* keep fallback */ }
+      if (!u) return;
+      PICS[n] = u; usedPics.add(u);
+      $$('img[data-car]').forEach(im => { if (im.dataset.car === n && !MY_PHOTOS[n]) im.src = u; });
+    }));
+    db.set('driveease_pics_v2', PICS);
+  }
+}
+
+/* =========================================================
+   3D CURSOR TILT ENGINE
+   ========================================================= */
+(() => {
+  const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const LERP = REDUCE ? 1 : 0.15;
+  const states = new Map();
+  let px = innerWidth/2, py = innerHeight/2, seen = false, raf = null;
+  const num = (v,f) => { const n = parseFloat(v); return Number.isFinite(n) ? n : f; };
+  function register(el) {
+    if (!el || states.has(el)) return;
+    states.set(el, { max:num(el.dataset.tilt,9), lift:num(el.dataset.lift,20), scale:num(el.dataset.scale,1.02), rx:0,ry:0,tz:0,sc:1, trx:0,try_:0,ttz:0,tsc:1 });
+    el.style.transformStyle='preserve-3d'; el.style.willChange='transform'; kick();
+  }
+  function scan(r){ if(!r||r.nodeType!==1)return; if(r.matches?.('[data-tilt]'))register(r); r.querySelectorAll?.('[data-tilt]').forEach(register); }
+  function kick(){ if(raf==null) raf=requestAnimationFrame(tick); }
+  function tick(){
+    raf=null; let alive=false;
+    states.forEach((s,el)=>{
+      if(!el.isConnected){states.delete(el);return;}
+      const r=el.getBoundingClientRect();
+      const over=seen && px>=r.left && px<=r.right && py>=r.top && py<=r.bottom;
+      let nx=0,ny=0;
+      if(over){ nx=(px-r.left)/r.width-.5; ny=(py-r.top)/r.height-.5; }
+      s.try_=nx*s.max*2; s.trx=-ny*s.max*2;
+      s.ttz=over?s.lift:0; s.tsc=over?s.scale:1;
+      s.ry+=(s.try_-s.ry)*LERP; s.rx+=(s.trx-s.rx)*LERP;
+      s.tz+=(s.ttz-s.tz)*LERP; s.sc+=(s.tsc-s.sc)*LERP;
+      el.style.transform=`perspective(1200px) rotateX(${s.rx.toFixed(3)}deg) rotateY(${s.ry.toFixed(3)}deg) translateZ(${s.tz.toFixed(2)}px) scale3d(${s.sc.toFixed(4)},${s.sc.toFixed(4)},1)`;
+      if(Math.abs(s.ry-s.try_)>.01||Math.abs(s.rx-s.trx)>.01||Math.abs(s.tz-s.ttz)>.05||Math.abs(s.sc-s.tsc)>.0004) alive=true;
+    });
+    if(alive) kick();
+  }
+  addEventListener('pointermove', e=>{px=e.clientX;py=e.clientY;seen=true;kick();},{passive:true});
+  addEventListener('pointerout', e=>{if(!e.relatedTarget){seen=false;kick();}});
+  addEventListener('scroll', kick, {passive:true});
+  addEventListener('resize', kick);
+  new MutationObserver(l=>l.forEach(m=>m.addedNodes.forEach(n=>scan(n)))).observe(document.documentElement,{childList:true,subtree:true});
+  scan(document.documentElement);
+})();
+
+/* ---------------- storage keys ---------------- */
+const K_CARS='driveease_cars_v3', K_USERS='driveease_users_v3', K_BOOKS='driveease_bookings_v3', K_SESS='driveease_session_v3';
+
+/* ---------------- Indian fleet ---------------- */
+const FLEET = [
+  // Latest 2024-25
+  { name:'Tata Curvv',           type:'SUV',       seats:5, fuel:'Petrol',   price:3500, year:2024, rating:4.6, trans:'Automatic', mileage:'17 kmpl' },
+  { name:'Mahindra Thar Roxx',   type:'SUV',       seats:5, fuel:'Diesel',   price:4200, year:2024, rating:4.7, trans:'Automatic', mileage:'15 kmpl' },
+  { name:'Tata Nexon 2024',      type:'SUV',       seats:5, fuel:'Petrol',   price:3200, year:2024, rating:4.6, trans:'Automatic', mileage:'17 kmpl' },
+  { name:'Hyundai Creta 2024',   type:'SUV',       seats:5, fuel:'Petrol',   price:3300, year:2024, rating:4.7, trans:'Automatic', mileage:'17 kmpl' },
+  { name:'Maruti Swift 2024',    type:'Hatchback', seats:5, fuel:'Petrol',   price:1800, year:2024, rating:4.5, trans:'Manual',    mileage:'24 kmpl' },
+  { name:'Maruti Fronx',         type:'SUV',       seats:5, fuel:'Petrol',   price:2400, year:2024, rating:4.5, trans:'Automatic', mileage:'20 kmpl' },
+  { name:'Mahindra XUV 3XO',     type:'SUV',       seats:5, fuel:'Petrol',   price:2900, year:2024, rating:4.6, trans:'Automatic', mileage:'18 kmpl' },
+  { name:'Hyundai Exter',        type:'SUV',       seats:5, fuel:'Petrol',   price:2200, year:2024, rating:4.4, trans:'Manual',    mileage:'19 kmpl' },
+  { name:'Tata Punch',           type:'SUV',       seats:5, fuel:'Petrol',   price:2100, year:2023, rating:4.4, trans:'Automatic', mileage:'18 kmpl' },
+  { name:'Honda Elevate',        type:'SUV',       seats:5, fuel:'Petrol',   price:3100, year:2023, rating:4.5, trans:'Automatic', mileage:'16 kmpl' },
+  // Previous 2020-23
+  { name:'Hyundai Creta 2022',   type:'SUV',       seats:5, fuel:'Diesel',   price:2800, year:2022, rating:4.5, trans:'Automatic', mileage:'18 kmpl' },
+  { name:'Kia Seltos',           type:'SUV',       seats:5, fuel:'Petrol',   price:2900, year:2022, rating:4.4, trans:'Automatic', mileage:'16 kmpl' },
+  { name:'Kia Sonet',            type:'SUV',       seats:5, fuel:'Petrol',   price:2400, year:2022, rating:4.3, trans:'Automatic', mileage:'18 kmpl' },
+  { name:'Honda City',           type:'Sedan',     seats:5, fuel:'Petrol',   price:2500, year:2021, rating:4.5, trans:'Automatic', mileage:'18 kmpl' },
+  { name:'Hyundai Verna',        type:'Sedan',     seats:5, fuel:'Petrol',   price:2600, year:2021, rating:4.4, trans:'Automatic', mileage:'20 kmpl' },
+  { name:'Skoda Slavia',         type:'Sedan',     seats:5, fuel:'Petrol',   price:2700, year:2022, rating:4.3, trans:'Automatic', mileage:'19 kmpl' },
+  { name:'Tata Altroz',          type:'Hatchback', seats:5, fuel:'Diesel',   price:1900, year:2021, rating:4.2, trans:'Manual',    mileage:'23 kmpl' },
+  { name:'Maruti Baleno',        type:'Hatchback', seats:5, fuel:'Petrol',   price:1800, year:2021, rating:4.3, trans:'Automatic', mileage:'19 kmpl' },
+  { name:'Tata Harrier',         type:'SUV',       seats:5, fuel:'Diesel',   price:3600, year:2021, rating:4.6, trans:'Manual',    mileage:'16 kmpl' },
+  { name:'Mahindra XUV700',      type:'SUV',       seats:7, fuel:'Diesel',   price:4500, year:2021, rating:4.7, trans:'Automatic', mileage:'16 kmpl' },
+  { name:'Mahindra Thar',        type:'SUV',       seats:4, fuel:'Diesel',   price:4000, year:2020, rating:4.8, trans:'Manual',    mileage:'15 kmpl' },
+  { name:'Toyota Innova Crysta', type:'MUV',       seats:7, fuel:'Diesel',   price:3800, year:2020, rating:4.7, trans:'Manual',    mileage:'14 kmpl' },
+  { name:'Maruti Ertiga',        type:'MUV',       seats:7, fuel:'CNG',      price:2400, year:2021, rating:4.3, trans:'Manual',    mileage:'26 km/kg' },
+  { name:'Tata Nexon EV',        type:'SUV',       seats:5, fuel:'Electric', price:3200, year:2022, rating:4.5, trans:'Automatic', mileage:'325 km range' },
+  { name:'Toyota Fortuner',      type:'SUV',       seats:7, fuel:'Diesel',   price:5500, year:2021, rating:4.9, trans:'Automatic', mileage:'12 kmpl' }
+];
+
+
+let view='cars', authTab='user', authMode='login', cmp=[];
+const user = () => SESSION;
+
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove('show'),2600); }
+const setErr = m => { const e=$('#err'); if(e) e.textContent = m||''; };
+
+async function signup(e){
+  e.preventDefault(); const f=e.target;
+  const name=f.name.value.trim(), email=f.email.value.trim().toLowerCase();
+  const pw=f.password.value, cp=f.confirm.value;
+  if(name.length<2) return setErr('Please enter your full name.');
+  if(!/^\S+@\S+\.\S+$/.test(email)) return setErr('Please enter a valid email address.');
+  if(pw.length<6) return setErr('Password must be at least 6 characters.');
+  if(pw!==cp) return setErr('Passwords do not match.');
+  const { data, error } = await sb.auth.signUp({ email, password:pw, options:{ data:{ name } } });
+  if(error) return setErr(error.message);
+  if(data.user && data.user.identities && data.user.identities.length===0) return setErr('This email is already registered. Log in instead.');
+  await sb.auth.signOut();
+  authMode='login'; authTab='user'; renderAuth();
+  toast('Account created — please log in.');
+}
+
+async function login(e, role){
+  e.preventDefault();
+  const email=e.target.email.value.trim().toLowerCase();
+  const pw=e.target.password.value;
+  const { data, error } = await sb.auth.signInWithPassword({ email, password:pw });
+  if(error) return setErr('Incorrect email or password.');
+  const u = await startSession(data.user);
+  if(!u) return setErr('Could not load your profile. Try again.');
+  if(role==='admin' && u.role!=='admin'){ await endSession(); return setErr('This is not an admin account. Use the User tab.'); }
+  if(role==='user'  && u.role==='admin'){ await endSession(); return setErr('Admin accounts must use the Admin tab.'); }
+  view = u.role==='admin' ? 'admin' : 'cars';
+  render();
+  toast('Welcome back, '+u.name.split(' ')[0]+'!');
+}
+
+async function startSession(authUser){
+  const { data:p } = await sb.from('profiles').select('*').eq('id', authUser.id).single();
+  if(!p) return null;
+  SESSION = { id:p.id, name:p.name, email:p.email, role:p.role };
+  await loadData();
+  startLive();
+  return SESSION;
+}
+async function endSession(){ stopLive(); await sb.auth.signOut(); SESSION=null; for(const k in CACHE) delete CACHE[k]; }
+
+/* ---------- live updates: Realtime push + 10s safety poll ---------- */
+let LIVE_CH = null, LIVE_T = null, LIVE_POLL = null;
+const fingerprint = () => JSON.stringify([CACHE['driveease_cars_v3'], CACHE['driveease_bookings_v3']]);
+async function refreshLive(){
+  if (!SESSION) return;
+  const typing = document.activeElement && /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName);
+  if (document.querySelector('.modal') || typing || document.hidden) { scheduleLive(3000); return; }
+  await WRITE_Q;
+  const before = fingerprint();
+  await loadData();
+  if (fingerprint() !== before) { render(); }
+}
+function scheduleLive(ms){ clearTimeout(LIVE_T); LIVE_T = setTimeout(refreshLive, ms || 400); }
+function startLive(){
+  stopLive();
+  LIVE_CH = sb.channel('driveease-live')
+    .on('postgres_changes', { event:'*', schema:'public', table:'bookings' }, () => scheduleLive())
+    .on('postgres_changes', { event:'*', schema:'public', table:'cars' }, () => scheduleLive())
+    .subscribe();
+  LIVE_POLL = setInterval(() => scheduleLive(), 10000);
+}
+function stopLive(){
+  if (LIVE_CH) { sb.removeChannel(LIVE_CH); LIVE_CH = null; }
+  clearInterval(LIVE_POLL); clearTimeout(LIVE_T);
+}
+
+async function logout(){ await endSession(); view='cars'; cmp=[]; render(); toast('Logged out.'); }
+
+function render(){
+  const u=user(); document.body.classList.toggle('login',!u);
+  const nav=$('#nav');
+  nav.innerHTML = u ? `
+    <a data-v="cars" class="${view==='cars'?'on':''}">Cars</a>
+    <a data-v="bookings" class="${view==='bookings'?'on':''}">My Bookings</a>
+    ${u.role==='admin'?`<a data-v="admin" class="${view==='admin'?'on':''}">Admin</a>`:''}
+    <span class="who"><i></i>${esc(u.name)}${u.role==='admin'?'<span class="role-badge">ADMIN</span>':''}</span>
+    <a id="lo">Log out</a>` : '';
+  $$('nav a[data-v]').forEach(a=>a.onclick=()=>{view=a.dataset.v;render();});
+  const lo=$('#lo'); if(lo) lo.onclick=logout;
+  if(!u) return renderAuth();
+  if(view==='bookings') return renderBookings();
+  if(view==='admin' && u.role==='admin') return renderAdmin();
+  return renderCars();
+}
+
+function renderAuth(){
+  const L = authMode==='login';
+  const roleLabel = authTab==='admin' ? 'Admin' : 'User';
+  $('#app').innerHTML = `
+  <div class="lg">
+    <div class="lg-l"><div class="road"><i></i><i></i><i></i><i></i></div><div class="wm">SWIFT</div>
+      <div class="brand">Drive<b>Ease</b> <span class="pill">INDIA</span></div>
+      <h2>Rent India's favourite cars.<br><span>Own every road.</span></h2>
+      <p>From the new Tata Curvv to the trusted Toyota Fortuner — search, compare and book self-drive cars across India with transparent rupee pricing, GST included.</p>
+      <div class="swift-hero">${imgTag(PHOTO_LIB.hatchRed,'Maruti Swift 2024')}<span class="swift-tag">🚗 Maruti Swift · from ₹1,800/day</span></div>
+      <div class="chips">
+        <span>🇮🇳 100% Indian fleet</span>
+        <span>📷 Real car photos</span>
+        <span>⚡ Instant confirmation</span>
+        <span>🛡️ Insurance add-on</span>
+      </div>
+    </div>
+    <div class="lg-r">
+      <div class="lg-card">
+        <h3>${L ? 'Welcome back' : 'Create your account'}</h3>
+        <div class="meta" style="color:var(--muted);font-size:.88rem">${L?'Log in to book your ride.':'It takes less than a minute.'}</div>
+        ${L ? `
+        <div class="role-tabs">
+          <button class="${authTab==='user'?'on':''}" data-r="user"><span class="r-icon">👤</span> User Login</button>
+          <button class="${authTab==='admin'?'on':''}" data-r="admin"><span class="r-icon">🛡️</span> Admin Login</button>
+        </div>` : ''}
+        <div class="mode-tabs" style="margin-top:16px">
+          <button class="${L?'on':''}" data-m="login">Log in</button>
+          <button class="${L?'':'on'}" data-m="signup">Sign up</button>
+        </div>
+        <form id="af" novalidate>
+          ${L?'':`<label for="name">Full name</label><input id="name" name="name" autocomplete="name" placeholder="Rahul Sharma">`}
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" placeholder="••••••">
+          ${L?'':`<label for="confirm">Confirm password</label><input id="confirm" name="confirm" type="password" placeholder="••••••">`}
+          <label class="chk"><input type="checkbox" id="sp"> Show password</label>
+          <div class="err" id="err"></div>
+          <button class="btn" style="width:100%">${L?`Log in as ${roleLabel}`:'Create account'}</button>
+        </form>
+        ${L ? `
+        <div class="demo-box">
+          <b>DEMO CREDENTIALS</b>
+          ${authTab==='admin'
+            ? `Admin → <code>admin@driveease.com</code> / <code>admin123</code>`
+            : `User → <code>user@driveease.com</code> / <code>user123</code><br>Or sign up with any email.`}
+        </div>` : ''}
+      </div>
+    </div>
+  </div>`;
+  $$('.role-tabs button').forEach(b=>b.onclick=()=>{authTab=b.dataset.r;setErr('');renderAuth();});
+  $$('.mode-tabs button').forEach(b=>b.onclick=()=>{authMode=b.dataset.m;setErr('');renderAuth();});
+  $('#sp').onchange = e => $$('#af input').forEach(i=>{ if(i.type==='password'||i.dataset.p){i.type=e.target.checked?'text':'password';i.dataset.p='1';} });
+  $('#af').onsubmit = e => L ? login(e, authTab) : signup(e);
+}
+
+const isBusyToday = c => {
+  const t=today();
+  if(c.maint && overlap(t,t,c.maint.from,c.maint.to)) return true;
+  return db.get(K_BOOKS).some(b=>b.carId===c.id && b.status==='confirmed' && overlap(t,t,b.start,b.end));
+};
+
+function renderCars(){
+  const u=user();
+  const cars=db.get(K_CARS);
+  const types=[...new Set(cars.map(c=>c.type))].sort();
+  const years=[...new Set(cars.map(c=>c.year))].sort((a,b)=>b-a);
+  const newest = cars.filter(c=>c.isNew).slice(0,2);
+
+  $('#app').innerHTML = `
+    <section class="page-hero">
+      <div>
+        <span class="eyebrow">Self-drive car rental · India</span>
+        <h2>Namaste ${esc(u.name.split(' ')[0])}, pick your ride.</h2>
+        <p>${cars.length} cars across ${types.length} body types. Tick up to 3 to compare side by side, then book in under a minute.</p>
+        <div class="chips" style="margin-top:20px">
+          <span style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#fff">🎁 10% off on 7+ days</span>
+          <span style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#fff">🧾 GST invoice</span>
+          <span style="background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#fff">📍 20+ cities</span>
+        </div>
+      </div>
+      <div class="hero-img">${imgTag(newest[0] ? newest[0].photo : PHOTO_LIB.generic, newest[0] ? newest[0].name : 'Featured car')}</div>
+    </section>
+    <div class="info-banner">
+      <span class="icon">💳</span>
+      <div class="text">
+        <b>How does payment work?</b>
+        <span>Pay securely via Card, UPI or Net banking. GST 18% included. Instant confirmation with printable receipt.</span>
+      </div>
+      <button class="btn" id="payInfo">See payment flow</button>
+    </div>
+    <div class="marquee"><div>${'<span>Tata</span><span>✦</span><span>Mahindra</span><span>✦</span><span>Hyundai</span><span>✦</span><span>Kia</span><span>✦</span><span>Honda</span><span>✦</span><span>Maruti Suzuki</span><span>✦</span><span>Toyota</span><span>✦</span><span>Škoda</span><span>✦</span>'.repeat(2)}</div></div>
+    <div class="filters-bar">
+      <input id="q" placeholder="🔍 Search by car name…">
+      <select id="ft"><option value="">All types</option>${types.map(t=>`<option>${esc(t)}</option>`).join('')}</select>
+      <select id="fy"><option value="">All years</option>${years.map(y=>`<option value="${y}">${y}${y>=2024?' (New)':''}</option>`).join('')}</select>
+      <select id="fp">
+        <option value="">Any price</option>
+        <option value="2000">Up to ₹2,000</option>
+        <option value="3000">Up to ₹3,000</option>
+        <option value="4000">Up to ₹4,000</option>
+        <option value="6000">Up to ₹6,000</option>
+      </select>
+      <select id="so">
+        <option value="">Sort by</option>
+        <option value="asc">Price: low → high</option>
+        <option value="desc">Price: high → low</option>
+        <option value="r">Top rated</option>
+        <option value="new">Newest first</option>
+      </select>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div id="cb"></div>`;
+
+  $('#payInfo').onclick = openPaymentInfo;
+
+  const card = c => `<article class="car" data-tilt="3" data-lift="10" data-scale="1.01">
+      <div class="car-img">
+        ${imgTag(c.photo, c.name)}
+        ${c.isNew?`<span class="badge-new">NEW ${c.year}</span>`:''}
+      </div>
+      <div class="car-body">
+        <div class="car-title-row">
+          <h3>${esc(c.name)}</h3>
+          <span class="rate">★ ${c.rating}</span>
+        </div>
+        <div class="car-year">${c.year} model · ${esc(c.type)}</div>
+        <div class="specs">
+          <div class="spec"><i>👥</i>${c.seats} seats</div>
+          <div class="spec"><i>⛽</i>${esc(c.fuel)}</div>
+          <div class="spec"><i>⚙️</i>${esc(c.trans)}</div>
+          <div class="spec"><i>🛣️</i>${esc(c.mileage)}</div>
+        </div>
+        <div class="price-row">
+          <div class="price">${inr(c.price)} <small>/ day</small></div>
+          <button class="btn" data-book="${c.id}">Book now →</button>
+        </div>
+        <label class="cmp-row"><input type="checkbox" data-c="${c.id}" ${cmp.includes(c.id)?'checked':''}> Add to compare</label>
+      </div>
+    </article>`;
+
+  const draw = () => {
+    const q=$('#q').value.trim().toLowerCase();
+    const t=$('#ft').value, y=+$('#fy').value, p=+$('#fp').value, s=$('#so').value;
+    let list = cars.filter(c => c.name.toLowerCase().includes(q) && (!t||c.type===t) && (!y||c.year===y) && (!p||c.price<=p));
+    if(s==='asc') list.sort((a,b)=>a.price-b.price);
+    else if(s==='desc') list.sort((a,b)=>b.price-a.price);
+    else if(s==='r') list.sort((a,b)=>b.rating-a.rating);
+    else if(s==='new') list.sort((a,b)=>b.year-a.year);
+    $('#grid').innerHTML = list.length ? list.map(card).join('') :
+      `<div class="empty"><h3>No cars match these filters</h3><p>Try clearing a filter or searching a different name.</p></div>`;
+    $$('#grid [data-book]').forEach(b=>b.onclick=()=>openBooking(+b.dataset.book));
+    $$('#grid [data-c]').forEach(i=>i.onchange=()=>{
+      const id=+i.dataset.c;
+      if(i.checked){ if(cmp.length>=3){i.checked=false;return toast('You can compare up to 3 cars.');} cmp.push(id); }
+      else cmp=cmp.filter(x=>x!==id);
+      bar();
+    });
+  };
+
+  const bar = () => {
+    $('#cb').innerHTML = cmp.length ? `
+      <div class="cmpbar">
+        <span>${cmp.length} car${cmp.length>1?'s':''} selected</span>
+        <button class="btn sm" id="cg" ${cmp.length<2?'disabled':''}>Compare prices</button>
+        <button class="btn ghost sm" id="cc" style="background:#fff;color:var(--brand);box-shadow:0 4px 0 rgba(0,0,0,.2)">Clear</button>
+      </div>` : '';
+    if(cmp.length){
+      $('#cc').onclick=()=>{cmp=[];draw();bar();};
+      $('#cg').onclick=openCompare;
+    }
+  };
+  ['q','ft','fy','fp','so'].forEach(id=>$('#'+id).oninput=draw);
+  draw(); bar();
+}
+
+function openPaymentInfo(){
+  const m = modal(`
+    <h2>💳 How payment works</h2>
+    <div style="font-size:.92rem;line-height:1.65;color:var(--ink2)">
+      <p><b style="color:var(--brand)">Step 1 — Choose car & dates.</b> The system checks real-time availability against existing bookings and maintenance schedules.</p>
+      <p><b style="color:var(--brand)">Step 2 — Add-ons & coupons.</b> Optionally add insurance, GPS, child seat or extra driver (per day). Apply <code style="background:#f1f5f9;padding:2px 6px;border-radius:5px">WELCOME10</code> for 10% off.</p>
+      <p><b style="color:var(--brand)">Step 3 — Price calculation.</b> Total = (days × daily rate) − weekly discount (10% if 7+ days) − coupon + add-ons. Then GST 18%.</p>
+      <p><b style="color:var(--brand)">Step 4 — Payment method.</b> Card (16 digits + expiry + CVV), UPI (name@bank format), or Net banking. All validated locally.</p>
+      <p><b style="color:var(--brand)">Step 5 — Confirmation.</b> 1.7s simulated processing. Booking saved to the cloud PostgreSQL database with a unique TXN ID. Printable receipt generated.</p>
+      <p style="background:#fef3c7;border-left:4px solid var(--accent);padding:10px 14px;border-radius:8px;color:#78350f;font-size:.88rem">
+        <b>⚠ Demo note:</b> Academic Review 1 project — no real money moves. All data stays in your browser.
+      </p>
+    </div>
+    <div style="text-align:right;margin-top:18px"><button class="btn" id="x">Got it</button></div>
+  `);
+  m.querySelector('#x').onclick = () => m.remove();
+}
+
+function openCompare(){
+  const cars = db.get(K_CARS).filter(c=>cmp.includes(c.id));
+  if(cars.length<2) return toast('Select at least 2 cars to compare.');
+  const minP=Math.min(...cars.map(c=>c.price));
+  const maxS=Math.max(...cars.map(c=>c.seats));
+  const maxR=Math.max(...cars.map(c=>c.rating));
+  const row=(l,fn,b)=>`<tr><th>${l}</th>${cars.map(c=>`<td class="${b&&b(c)?'best':''}">${fn(c)}</td>`).join('')}</tr>`;
+  const m = modal(`
+    <h2>Compare cars</h2>
+    <p class="meta">Green cells mark the best value in each row.</p>
+    <div class="wrap" style="margin-top:14px"><table>
+      <tr><th>Car</th>${cars.map(c=>`<th>${esc(c.name)}</th>`).join('')}</tr>
+      <tr><th>Photo</th>${cars.map(c=>`<td><div style="width:140px;aspect-ratio:16/10;border-radius:10px;overflow:hidden">${imgTag(c.photo,c.name)}</div></td>`).join('')}</tr>
+      ${row('Price / day',c=>inr(c.price),c=>c.price===minP)}
+      ${row('3-day cost',c=>inr(c.price*3),c=>c.price===minP)}
+      ${row('7-day cost (10% off)',c=>inr(c.price*7*.9),c=>c.price===minP)}
+      ${row('Year',c=>c.year+(c.isNew?' 🆕':''))}
+      ${row('Type',c=>esc(c.type))}
+      ${row('Seats',c=>c.seats,c=>c.seats===maxS)}
+      ${row('Fuel',c=>esc(c.fuel))}
+      ${row('Transmission',c=>esc(c.trans))}
+      ${row('Mileage',c=>esc(c.mileage))}
+      ${row('Rating',c=>'★ '+c.rating,c=>c.rating===maxR)}
+    </table></div>
+    <div style="display:flex;justify-content:space-between;gap:10px;margin-top:18px">
+      <button class="btn ghost" id="x">Close</button>
+      <button class="btn" id="bk">Book the cheapest</button>
+    </div>`, true);
+  $('#x').onclick=()=>m.remove();
+  $('#bk').onclick=()=>{const best=cars.find(c=>c.price===minP);m.remove();openBooking(best.id);};
+}
+
+function modal(html, wide){
+  const m=document.createElement('div');
+  m.className='modal';
+  m.innerHTML=`<div class="box ${wide?'wide':''}">${html}</div>`;
+  m.addEventListener('click', e=>{if(e.target===m)m.remove();});
+  document.body.appendChild(m);
+  return m;
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ const m=$('.modal'); if(m)m.remove(); }});
+
+const ADDONS = { ins:['Full insurance cover',200], gps:['GPS navigation',100], seat:['Child seat',80], driver:['Additional driver',150] };
+const COUPONS = { WELCOME10:0.10, INDIA15:0.15 };
+
+function quote(car,s,e,adds,code){
+  const d=days(s,e);
+  const base=d*car.price;
+  const weekly=d>=7?base*0.10:0;
+  const addon=adds.reduce((a,k)=>a+(ADDONS[k]?ADDONS[k][1]*d:0),0);
+  const rate=COUPONS[String(code).trim().toUpperCase()]||0;
+  const coupon=(base-weekly)*rate;
+  const sub=base-weekly-coupon+addon;
+  const gst=sub*0.18;
+  return {d,base,weekly,addon,coupon,couponCode:rate?String(code).trim().toUpperCase():'',gst,total:sub+gst};
+}
+
+function openBooking(id){
+  const car = db.get(K_CARS).find(c=>c.id===id);
+  if(!car) return toast('Car not found.');
+  let q=null;
+  const m = modal(`
+    <div class="bk-head">
+      <div class="bk-pic">${imgTag(car.photo,car.name)}</div>
+      <div style="flex:1;min-width:200px">
+        <h2>${esc(car.name)}</h2>
+        <div class="meta" style="font-size:.85rem">${car.year} · ${esc(car.type)} · ${car.seats} seats · ${esc(car.fuel)} · ${esc(car.trans)}</div>
+        <div class="price" style="margin-top:8px">${inr(car.price)} <small>/ day + 18% GST</small></div>
+      </div>
+    </div>
+    <div id="st"></div>`, true);
+  const st = $('#st');
+
+  const step1 = () => {
+    st.innerHTML = `
+      <div class="steps"><span class="on">1 · Dates</span><span>2 · Payment</span><span>3 · Confirmed</span></div>
+      <div class="form-row">
+        <div><label for="s">Pick-up date</label><input id="s" type="date" min="${today()}" value="${today()}"></div>
+        <div><label for="e">Return date</label><input id="e" type="date" min="${today()}" value="${addDays(today(),2)}"></div>
+      </div>
+      <label>Add-ons (per day)</label>
+      ${Object.entries(ADDONS).map(([k,v])=>`<label class="chk"><input type="checkbox" data-a="${k}"> ${v[0]} (+${inr(v[1])}/day)</label>`).join('')}
+      <label for="cp">Coupon code</label>
+      <input id="cp" placeholder="Try WELCOME10 or INDIA15" autocomplete="off">
+      <div class="sum" id="sum"></div>
+      <div class="err" id="err"></div>
+      <div style="display:flex;justify-content:space-between;gap:10px;margin-top:18px">
+        <button class="btn ghost" id="x">Cancel</button>
+        <button class="btn" id="go" disabled>Continue to payment →</button>
+      </div>`;
+    const calc = () => {
+      setErr('');
+      const s=$('#s').value, e=$('#e').value;
+      const go=$('#go'); go.disabled=true;
+      if(!s||!e){ $('#sum').textContent='Select your dates to see the total.'; return; }
+      if(e<s){ $('#sum').textContent='Return date must be on or after the pick-up date.'; return; }
+      if(s<today()){ $('#sum').textContent='Pick-up date cannot be in the past.'; return; }
+      if(unavailable(car,s,e)){ $('#sum').innerHTML='<b style="color:#dc2626">This car is unavailable on those dates (already booked or under maintenance).</b>'; return; }
+      const adds = $$('[data-a]:checked').map(i=>i.dataset.a);
+      q = quote(car,s,e,adds,$('#cp').value);
+      q.s=s; q.e=e; q.adds=adds;
+      $('#sum').innerHTML = `
+        <div><span>${q.d} day(s) × ${inr(car.price)}</span><span>${inr(q.base)}</span></div>
+        ${q.weekly?`<div><span>Weekly discount (10%)</span><span>− ${inr(q.weekly)}</span></div>`:''}
+        ${q.coupon?`<div><span>Coupon ${esc(q.couponCode)}</span><span>− ${inr(q.coupon)}</span></div>`:''}
+        ${q.addon?`<div><span>Add-ons</span><span>${inr(q.addon)}</span></div>`:''}
+        <div><span>GST @ 18%</span><span>${inr(q.gst)}</span></div>
+        <div><b>Total payable</b><b>${inr(q.total)}</b></div>`;
+      go.disabled=false;
+    };
+    ['s','e','cp'].forEach(i=>$('#'+i).oninput=calc);
+    $$('[data-a]').forEach(i=>i.onchange=calc);
+    $('#x').onclick=()=>m.remove();
+    $('#go').onclick=step2;
+    calc();
+  };
+
+  const step2 = () => {
+    st.innerHTML = `
+      <div class="steps"><span>1 · Dates</span><span class="on">2 · Payment</span><span>3 · Confirmed</span></div>
+      <div class="pay-info"><b>🔒 Secure demo checkout</b>No real money is charged. Card details are validated in your browser and never stored.</div>
+      <p style="margin:8px 0">Amount payable: <b style="font-size:1.2rem;color:var(--brand)">${inr(q.total)}</b> <span class="meta">(${q.d} day${q.d>1?'s':''}, GST included)</span></p>
+      <label for="pm">Payment method</label>
+      <select id="pm">
+        <option value="Card">Credit / Debit card</option>
+        <option value="UPI">UPI (GPay / PhonePe / Paytm)</option>
+        <option value="NetBanking">Net banking</option>
+      </select>
+      <div id="pf"></div>
+      <div class="err" id="err"></div>
+      <div style="display:flex;justify-content:space-between;gap:10px;margin-top:18px">
+        <button class="btn ghost" id="bk">← Back</button>
+        <button class="btn" id="pay">Pay ${inr(q.total)}</button>
+      </div>`;
+    const pf = () => {
+      const v=$('#pm').value;
+      if(v==='Card'){
+        $('#pf').innerHTML = `
+          <label for="cn">Card number</label>
+          <input id="cn" inputmode="numeric" maxlength="19" placeholder="1234 5678 9012 3456">
+          <div class="form-row">
+            <div><label for="ex">Expiry (MM/YY)</label><input id="ex" maxlength="5" placeholder="08/29"></div>
+            <div><label for="cv">CVV</label><input id="cv" type="password" maxlength="3" placeholder="123"></div>
+          </div>`;
+        $('#cn').oninput = e => e.target.value = e.target.value.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim();
+        $('#ex').oninput = e => e.target.value = e.target.value.replace(/\D/g,'').slice(0,4).replace(/^(\d{2})(\d+)/,'$1/$2');
+      } else if(v==='UPI'){
+        $('#pf').innerHTML = `<label for="up">UPI ID</label><input id="up" placeholder="yourname@bank">`;
+      } else {
+        $('#pf').innerHTML = `<label for="bk2">Select your bank</label>
+          <select id="bk2">
+            <option>State Bank of India</option><option>HDFC Bank</option><option>ICICI Bank</option>
+            <option>Axis Bank</option><option>Punjab National Bank</option><option>Kotak Mahindra Bank</option>
+          </select>`;
+      }
+    };
+    pf(); $('#pm').onchange=pf; $('#bk').onclick=step1;
+    $('#pay').onclick = () => {
+      const v=$('#pm').value; let ref='';
+      if(v==='Card'){
+        const n=$('#cn').value.replace(/\s/g,'');
+        const ex=$('#ex').value.match(/^(\d{2})\/(\d{2})$/);
+        if(n.length!==16) return setErr('Enter a valid 16-digit card number.');
+        if(!ex||+ex[1]<1||+ex[1]>12) return setErr('Enter a valid expiry date as MM/YY.');
+        if(new Date(2000+ +ex[2], +ex[1], 0) < new Date()) return setErr('This card has expired.');
+        if($('#cv').value.length!==3) return setErr('Enter the 3-digit CVV.');
+        ref = 'Card •••• '+n.slice(-4);
+      } else if(v==='UPI'){
+        if(!/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test($('#up').value.trim())) return setErr('Enter a valid UPI ID (e.g. name@bank).');
+        ref = 'UPI '+$('#up').value.trim();
+      } else { ref = 'NetBanking • '+$('#bk2').value; }
+      st.innerHTML = `<div class="spin"></div><p style="text-align:center">Processing payment securely…</p>`;
+      setTimeout(async () => {
+        if(unavailable(car,q.s,q.e)){
+          st.innerHTML = `<p style="color:#dc2626"><b>Sorry — this car was just booked for those dates.</b></p><button class="btn" id="x2">Choose another car</button>`;
+          return $('#x2').onclick=()=>m.remove();
+        }
+        const rec = {
+          id:'DE'+Date.now().toString().slice(-7),
+          carId:car.id, carName:car.name, carType:car.type, carYear:car.year, carPhoto:car.photo,
+          userEmail:user().email, userName:user().name,
+          start:q.s, end:q.e, days:q.d,
+          addons:q.adds, coupon:q.couponCode,
+          base:q.base, weekly:q.weekly, couponAmt:q.coupon, addonAmt:q.addon,
+          gst:q.gst, total:q.total, payment:ref,
+          txn:'TXN'+Math.random().toString(36).slice(2,10).toUpperCase(),
+          status:'confirmed', paidOn:new Date().toLocaleString('en-IN')
+        };
+        const bErr = await addBooking(rec);
+        if(bErr){
+          await loadData();
+          st.innerHTML = `<p style="color:#dc2626"><b>Sorry — this car was just booked for those dates.</b></p><button class="btn" id="x3">Choose another car</button>`;
+          return $('#x3').onclick=()=>{ m.remove(); render(); };
+        }
+        receipt(m, rec);
+      }, 1700);
+    };
+  };
+  step1();
+}
+
+const unavailable = (car,s,e) =>
+  (car.maint && overlap(s,e,car.maint.from,car.maint.to)) ||
+  db.get(K_BOOKS).some(b=>b.carId===car.id && b.status==='confirmed' && overlap(s,e,b.start,b.end));
+
+function receipt(m,r){
+  m.querySelector('.box').innerHTML = `
+    <div class="ok">✔</div>
+    <h2 style="text-align:center">Booking confirmed</h2>
+    <p style="text-align:center;color:var(--muted);font-size:.88rem">A confirmation has been sent to ${esc(r.userEmail)}</p>
+    <div class="bk-head" style="margin-top:16px">
+      <div class="bk-pic">${imgTag(r.carPhoto || PHOTO_LIB.generic, r.carName)}</div>
+      <div><b style="color:var(--brand);font-size:1.05rem">${esc(r.carName)}</b>
+        <div class="meta">${esc(r.carType||'')} · ${r.days} day(s)</div>
+      </div>
+    </div>
+    <div class="sum">
+      <div><span>Booking ID</span><b>${r.id}</b></div>
+      <div><span>Pick-up</span><span>${r.start}</span></div>
+      <div><span>Return</span><span>${r.end}</span></div>
+      <div><span>Customer</span><span>${esc(r.userName)}</span></div>
+      ${r.addons&&r.addons.length?`<div><span>Add-ons</span><span>${r.addons.map(a=>esc(ADDONS[a][0])).join(', ')}</span></div>`:''}
+      ${r.couponAmt?`<div><span>Coupon (${esc(r.coupon)})</span><span>− ${inr(r.couponAmt)}</span></div>`:''}
+      <div><span>GST @ 18%</span><span>${inr(r.gst)}</span></div>
+      <div><span>Paid via</span><span>${esc(r.payment)}</span></div>
+      <div><span>Transaction ID</span><span>${r.txn}</span></div>
+      <div><b>Total paid</b><b>${inr(r.total)}</b></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:10px;margin-top:20px">
+      <button class="btn ghost" id="pr">🖨 Print receipt</button>
+      <button class="btn" id="dn">View my bookings</button>
+    </div>`;
+  $('#pr').onclick = () => window.print();
+  $('#dn').onclick = () => { m.remove(); view='bookings'; render(); };
+}
+
+function renderBookings(){
+  const list = db.get(K_BOOKS).filter(b=>b.userEmail===user().email).reverse();
+  $('#app').innerHTML = `
+    <h2 style="margin-bottom:18px">My bookings</h2>
+    ${list.length ? `
+      <div class="wrap"><table>
+        <thead><tr><th>Car</th><th>Booking ID</th><th>Dates</th><th>Days</th><th>Total</th><th>Status</th><th></th></tr></thead>
+        <tbody>${list.map(b=>`<tr>
+          <td style="display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)">
+            <div style="width:70px;aspect-ratio:16/10;border-radius:8px;overflow:hidden;flex:0 0 auto">${imgTag(b.carPhoto||PHOTO_LIB.generic,b.carName)}</div>
+            <div><b>${esc(b.carName)}</b><br><span class="meta">${esc(b.carType||'')} ${b.carYear?'('+b.carYear+')':''}</span></div>
+          </td>
+          <td><b>${b.id}</b><br><span class="meta">${b.txn}</span></td>
+          <td>${b.start}<br><span class="meta">→ ${b.end}</span></td>
+          <td>${b.days}</td>
+          <td><b>${inr(b.total)}</b></td>
+          <td><span class="tag ${b.status==='confirmed'?'':'bad'}">${b.status}</span></td>
+          <td>${b.status==='confirmed'&&b.start>today()?`<button class="btn red sm" data-cancel="${b.id}">Cancel</button>`:''}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+      <p class="meta" style="margin-top:14px;font-size:.82rem">Free cancellation until the day before pick-up. Refunds go to the original payment method within 5–7 working days.</p>`
+      : `<div class="panel" style="text-align:center;padding:56px 20px">
+           <h3>No bookings yet</h3>
+           <p class="meta">Browse our Indian fleet and book your first ride.</p>
+           <button class="btn" onclick="view='cars';render()">Browse cars</button>
+         </div>`}`;
+  $$('[data-cancel]').forEach(b=>b.onclick=()=>cancelBooking(b.dataset.cancel));
+}
+
+function cancelBooking(id){
+  const bookings=db.get(K_BOOKS);
+  const b=bookings.find(x=>x.id===id);
+  if(!b) return;
+  if(!confirm(`Cancel booking ${id} for ${b.carName}?`)) return;
+  b.status='cancelled'; db.set(K_BOOKS,bookings);
+  render(); toast('Booking '+id+' cancelled.');
+}
+
+function renderAdmin(){
+  const cars=db.get(K_CARS);
+  const bookings=db.get(K_BOOKS).slice().reverse();
+  const active=bookings.filter(b=>b.status==='confirmed');
+  const revenue=active.reduce((a,b)=>a+b.total,0);
+  const t=today();
+  const maintCount=cars.filter(c=>c.maint && t<=c.maint.to).length;
+  const users=db.get(K_USERS).length;
+
+  $('#app').innerHTML = `
+    <h2 style="margin-bottom:18px">Admin dashboard</h2>
+    <div class="stats">
+      <div class="stat"><b>${cars.length}</b><span>Cars in fleet</span></div>
+      <div class="stat"><b>${active.length}</b><span>Active bookings</span></div>
+      <div class="stat"><b>${inr(revenue)}</b><span>Total revenue</span></div>
+      <div class="stat"><b>${maintCount}</b><span>Under maintenance</span></div>
+    </div>
+
+    <div class="panel">
+      <h3>Add a new car</h3>
+      <form id="cf" class="form-row">
+        <input name="name" placeholder="Car name (e.g. Tata Punch)" required>
+        <input name="type" placeholder="Type (SUV / Sedan / Hatchback / MUV)" required>
+        <input name="year" type="number" min="2015" max="2030" placeholder="Year" required>
+        <input name="seats" type="number" min="2" max="12" placeholder="Seats" required>
+        <select name="fuel"><option>Petrol</option><option>Diesel</option><option>Electric</option><option>CNG</option></select>
+        <input name="price" type="number" min="100" placeholder="Price / day (₹)" required>
+        <input name="trans" placeholder="Transmission (Manual / Automatic)">
+        <input name="mileage" placeholder="Mileage (e.g. 18 kmpl)">
+        <button class="btn" style="margin:0">Add car</button>
+      </form>
+      <p class="meta" style="margin-top:12px;font-size:.78rem">A matching photo will be auto-assigned based on the car name & type. To override, edit the car's <code>photo</code> field in localStorage.</p>
+    </div>
+
+    <h3 style="margin-bottom:14px">Inventory &amp; maintenance</h3>
+    <div class="wrap"><table>
+      <thead><tr><th>Car</th><th>Price / day</th><th>Maintenance</th><th>Schedule</th><th></th></tr></thead>
+      <tbody>${cars.map(c=>`<tr>
+        <td style="display:flex;align-items:center;gap:12px">
+          <div style="width:70px;aspect-ratio:16/10;border-radius:8px;overflow:hidden;flex:0 0 auto">${imgTag(c.photo,c.name)}</div>
+          <div><b>${esc(c.name)}</b>${c.isNew?' <span class="tag warn" style="font-size:.65rem">NEW</span>':''}<br>
+            <span class="meta">${c.year} · ${esc(c.type)} · ${c.seats} seats</span></div>
+        </td>
+        <td><input type="number" value="${c.price}" data-price="${c.id}" style="width:110px"></td>
+        <td>${c.maint?`<span class="tag bad">${c.maint.from} → ${c.maint.to}</span>`:`<span class="tag">None</span>`}</td>
+        <td><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <input type="date" data-from="${c.id}" min="${t}" style="width:150px">
+          <input type="date" data-to="${c.id}" min="${t}" style="width:150px">
+          <button class="btn alt sm" data-maint="${c.id}">Set</button>
+          ${c.maint?`<button class="btn ghost sm" data-clear="${c.id}">Clear</button>`:''}
+        </div></td>
+        <td><button class="btn red sm" data-del="${c.id}">Remove</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+
+    <h3 style="margin:26px 0 14px">All bookings (${bookings.length})</h3>
+    ${bookings.length ? `<div class="wrap"><table>
+      <thead><tr><th>ID</th><th>Customer</th><th>Car</th><th>Dates</th><th>Total</th><th>Payment</th><th>Status</th><th></th></tr></thead>
+      <tbody>${bookings.map(b=>`<tr>
+        <td><b>${b.id}</b><br><span class="meta">${b.txn}</span></td>
+        <td>${esc(b.userName)}<br><span class="meta">${esc(b.userEmail)}</span></td>
+        <td>${esc(b.carName)}</td>
+        <td>${b.start} → ${b.end}<br><span class="meta">${b.days} day(s)</span></td>
+        <td><b>${inr(b.total)}</b></td>
+        <td class="meta">${esc(b.payment||'')}</td>
+        <td><span class="tag ${b.status==='confirmed'?'':'bad'}">${b.status}</span></td>
+        <td>${b.status==='confirmed'?`<button class="btn red sm" data-xcancel="${b.id}">Cancel</button>`:''}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>` : '<p class="meta">No bookings yet.</p>'}
+
+    <p class="meta" style="margin-top:20px">Registered users: <b>${users}</b></p>`;
+
+  $('#cf').onsubmit = e => {
+    e.preventDefault(); const f=e.target;
+    const name=f.name.value.trim(), type=f.type.value.trim();
+    const yr=+f.year.value;
+    cars.push({
+      id:Date.now(), name, type, year:yr, isNew:yr>=2024,
+      seats:+f.seats.value, fuel:f.fuel.value, price:+f.price.value,
+      rating:4.3, trans:f.trans.value.trim()||'Manual',
+      mileage:f.mileage.value.trim()||'—',
+      photo: photoFor(name, type),
+      maint:null
+    });
+    db.set(K_CARS,cars); renderAdmin(); toast('Car added to the fleet.');
+  };
+  $$('[data-price]').forEach(i=>i.onchange=()=>{
+    const v=+i.value;
+    if(v>=100){ cars.find(c=>c.id==i.dataset.price).price=v; db.set(K_CARS,cars); toast('Price updated.'); }
+    else { toast('Price must be at least ₹100.'); i.value=cars.find(c=>c.id==i.dataset.price).price; }
+  });
+  $$('[data-maint]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.maint;
+    const from=$(`[data-from="${id}"]`).value, to=$(`[data-to="${id}"]`).value;
+    if(!from||!to||to<from) return toast('Please pick a valid maintenance date range.');
+    const clash=db.get(K_BOOKS).some(x=>x.carId==id && x.status==='confirmed' && overlap(from,to,x.start,x.end));
+    if(clash) return toast('This car has confirmed bookings in that range.');
+    cars.find(c=>c.id==id).maint={from,to}; db.set(K_CARS,cars); renderAdmin(); toast('Maintenance scheduled.');
+  });
+  $$('[data-clear]').forEach(b=>b.onclick=()=>{
+    cars.find(c=>c.id==b.dataset.clear).maint=null; db.set(K_CARS,cars); renderAdmin(); toast('Maintenance cleared.');
+  });
+  $$('[data-del]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.del;
+    if(db.get(K_BOOKS).some(x=>x.carId==id && x.status==='confirmed')) return toast('Cannot remove a car with active bookings.');
+    if(!confirm('Remove this car from the fleet?')) return;
+    db.set(K_CARS, cars.filter(c=>c.id!=id)); renderAdmin(); toast('Car removed.');
+  });
+  $$('[data-xcancel]').forEach(b=>b.onclick=()=>{
+    const list=db.get(K_BOOKS);
+    const rec=list.find(x=>x.id===b.dataset.xcancel);
+    if(!rec||!confirm('Cancel booking '+rec.id+'?')) return;
+    rec.status='cancelled'; db.set(K_BOOKS,list); renderAdmin(); toast('Booking cancelled.');
+  });
+}
+
+/* ===== effects: scroll reveal + cursor spotlight on cards ===== */
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .1 });
+  const watch = n => { if (n.nodeType !== 1) return; if (n.matches('.car,.stat,.panel')) io.observe(n); n.querySelectorAll('.car,.stat,.panel').forEach(x => io.observe(x)); };
+  new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(watch))).observe(document.body, { childList: true, subtree: true });
+  document.documentElement.classList.add('rv');
+  watch(document.body);
+  addEventListener('pointermove', e => {
+    const c = e.target.closest && e.target.closest('.car');
+    if (c) { const r = c.getBoundingClientRect(); c.style.setProperty('--mx', (e.clientX - r.left) + 'px'); c.style.setProperty('--my', (e.clientY - r.top) + 'px'); }
+  }, { passive: true });
+})();
+
+(async () => {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (session) { const u = await startSession(session.user); if (!u) await endSession(); }
+  render();
+  loadPics();
+})();
+</script>
+</body>
+</html>
