@@ -53,6 +53,8 @@ create table public.bookings (
   txn         text,
   status      text not null default 'confirmed' check (status in ('confirmed','cancelled')),
   paid_on     text,
+  delivery_fee     numeric(12,2) not null default 0,
+  delivery_address text not null default '',
   created_at  timestamptz not null default now(),
   check (end_date >= start_date),
   -- the database itself refuses double-booking of a car
