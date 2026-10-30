@@ -355,12 +355,12 @@ const bookFrom = r => ({ id:r.id, carId:r.car_id, carName:r.car_name, carType:r.
   userId:r.user_id, userEmail:r.user_email, userName:r.user_name, start:r.start_date, end:r.end_date, days:r.days,
   addons:r.addons, coupon:r.coupon, base:Number(r.base), weekly:Number(r.weekly), couponAmt:Number(r.coupon_amt),
   addonAmt:Number(r.addon_amt), gst:Number(r.gst), total:Number(r.total), payment:r.payment, txn:r.txn,
-  status:r.status, paidOn:r.paid_on });
+  status:r.status, paidOn:r.paid_on, deliveryFee:Number(r.delivery_fee||0), deliveryAddr:r.delivery_address||'' });
 const bookTo = b => ({ id:b.id, car_id:b.carId, car_name:b.carName, car_type:b.carType, car_year:b.carYear, car_photo:b.carPhoto,
   user_id:b.userId || (SESSION && SESSION.id), user_email:b.userEmail, user_name:b.userName,
   start_date:b.start, end_date:b.end, days:b.days, addons:b.addons || [], coupon:b.coupon || '',
   base:b.base, weekly:b.weekly, coupon_amt:b.couponAmt, addon_amt:b.addonAmt, gst:b.gst, total:b.total,
-  payment:b.payment, txn:b.txn, status:b.status, paid_on:b.paidOn });
+  payment:b.payment, txn:b.txn, status:b.status, paid_on:b.paidOn, delivery_fee:b.deliveryFee||0, delivery_address:b.deliveryAddr||'' });
 const TO_ROW = { cars:carTo, bookings:bookTo };
 
 let WRITE_Q = Promise.resolve();
@@ -930,7 +930,7 @@ function openPaymentInfo(){
     <div style="font-size:.92rem;line-height:1.65;color:var(--ink2)">
       <p><b style="color:var(--brand)">Step 1 — Choose car & dates.</b> The system checks real-time availability against existing bookings and maintenance schedules.</p>
       <p><b style="color:var(--brand)">Step 2 — Add-ons & coupons.</b> Optionally add insurance, GPS, child seat or extra driver (per day). Apply <code style="background:#f1f5f9;padding:2px 6px;border-radius:5px">WELCOME10</code> for 10% off.</p>
-      <p><b style="color:var(--brand)">Step 3 — Price calculation.</b> Total = (days × daily rate) − weekly discount (10% if 7+ days) − coupon + add-ons. Then GST 18%.</p>
+      <p><b style="color:var(--brand)">Step 3 — Price calculation.</b> Total = (days × daily rate) − discount (10% for 7+ days, 20% for 30+ days) − coupon + add-ons + delivery fee. Then GST 18%.</p>
       <p><b style="color:var(--brand)">Step 4 — Payment method.</b> Card (16 digits + expiry + CVV), UPI (name@bank format), or Net banking. All validated locally.</p>
       <p><b style="color:var(--brand)">Step 5 — Confirmation.</b> 1.7s simulated processing. Booking saved to the cloud PostgreSQL database with a unique TXN ID. Printable receipt generated.</p>
       <p style="background:#fef3c7;border-left:4px solid var(--accent);padding:10px 14px;border-radius:8px;color:#78350f;font-size:.88rem">
@@ -987,16 +987,19 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ const m=$('.moda
 const ADDONS = { ins:['Full insurance cover',200], gps:['GPS navigation',100], seat:['Child seat',80], driver:['Additional driver',150] };
 const COUPONS = { WELCOME10:0.10, INDIA15:0.15 };
 
-function quote(car,s,e,adds,code){
+const DELIVERY_FEE = 300;
+function quote(car,s,e,adds,code,deliver){
   const d=days(s,e);
   const base=d*car.price;
-  const weekly=d>=7?base*0.10:0;
+  const discPct=d>=30?0.20:d>=7?0.10:0;
+  const weekly=base*discPct;
+  const delivery=deliver?DELIVERY_FEE:0;
   const addon=adds.reduce((a,k)=>a+(ADDONS[k]?ADDONS[k][1]*d:0),0);
   const rate=COUPONS[String(code).trim().toUpperCase()]||0;
   const coupon=(base-weekly)*rate;
-  const sub=base-weekly-coupon+addon;
+  const sub=base-weekly-coupon+addon+delivery;
   const gst=sub*0.18;
-  return {d,base,weekly,addon,coupon,couponCode:rate?String(code).trim().toUpperCase():'',gst,total:sub+gst};
+  return {d,base,weekly,discPct,delivery,addon,coupon,couponCode:rate?String(code).trim().toUpperCase():'',gst,total:sub+gst};
 }
 
 function openBooking(id){
@@ -1022,8 +1025,15 @@ function openBooking(id){
         <div><label for="s">Pick-up date</label><input id="s" type="date" min="${today()}" value="${today()}"></div>
         <div><label for="e">Return date</label><input id="e" type="date" min="${today()}" value="${addDays(today(),2)}"></div>
       </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 12px">
+        <button type="button" class="btn ghost" data-q="3" style="padding:6px 12px;font-size:.8rem">3 days</button>
+        <button type="button" class="btn ghost" data-q="7" style="padding:6px 12px;font-size:.8rem">1 week (10% off)</button>
+        <button type="button" class="btn ghost" data-q="30" style="padding:6px 12px;font-size:.8rem">1 month (20% off)</button>
+      </div>
       <label>Add-ons (per day)</label>
       ${Object.entries(ADDONS).map(([k,v])=>`<label class="chk"><input type="checkbox" data-a="${k}"> ${v[0]} (+${inr(v[1])}/day)</label>`).join('')}
+      <label class="chk"><input type="checkbox" id="dl"> 🚚 Doorstep delivery &amp; pick-up (+${inr(DELIVERY_FEE)} flat)</label>
+      <div id="dlbox" style="display:none"><label for="da">Delivery address</label><textarea id="da" rows="2" placeholder="House no, street, area, city, PIN" style="width:100%"></textarea></div>
       <label for="cp">Coupon code</label>
       <input id="cp" placeholder="Try WELCOME10 or INDIA15" autocomplete="off">
       <div class="sum" id="sum"></div>
@@ -1041,18 +1051,24 @@ function openBooking(id){
       if(s<today()){ $('#sum').textContent='Pick-up date cannot be in the past.'; return; }
       if(unavailable(car,s,e)){ $('#sum').innerHTML='<b style="color:#dc2626">This car is unavailable on those dates (already booked or under maintenance).</b>'; return; }
       const adds = $$('[data-a]:checked').map(i=>i.dataset.a);
-      q = quote(car,s,e,adds,$('#cp').value);
-      q.s=s; q.e=e; q.adds=adds;
+      const deliver = $('#dl').checked, addr = $('#da').value.trim();
+      $('#dlbox').style.display = deliver ? 'block' : 'none';
+      q = quote(car,s,e,adds,$('#cp').value,deliver);
+      q.s=s; q.e=e; q.adds=adds; q.addr = deliver ? addr : '';
       $('#sum').innerHTML = `
         <div><span>${q.d} day(s) × ${inr(car.price)}</span><span>${inr(q.base)}</span></div>
-        ${q.weekly?`<div><span>Weekly discount (10%)</span><span>− ${inr(q.weekly)}</span></div>`:''}
+        ${q.weekly?`<div><span>${q.d>=30?'Monthly':'Weekly'} discount (${Math.round(q.discPct*100)}%)</span><span>− ${inr(q.weekly)}</span></div>`:''}
         ${q.coupon?`<div><span>Coupon ${esc(q.couponCode)}</span><span>− ${inr(q.coupon)}</span></div>`:''}
         ${q.addon?`<div><span>Add-ons</span><span>${inr(q.addon)}</span></div>`:''}
+        ${q.delivery?`<div><span>Doorstep delivery</span><span>${inr(q.delivery)}</span></div>`:''}
         <div><span>GST @ 18%</span><span>${inr(q.gst)}</span></div>
         <div><b>Total payable</b><b>${inr(q.total)}</b></div>`;
+      if(deliver && addr.length<8){ setErr('Please enter your full delivery address.'); return; }
       go.disabled=false;
     };
-    ['s','e','cp'].forEach(i=>$('#'+i).oninput=calc);
+    ['s','e','cp','da'].forEach(i=>$('#'+i).oninput=calc);
+    $('#dl').onchange=calc;
+    $$('[data-q]').forEach(b=>b.onclick=()=>{ const st0=$('#s').value||today(); $('#s').value=st0; $('#e').value=addDays(st0,+b.dataset.q-1); calc(); });
     $$('[data-a]').forEach(i=>i.onchange=calc);
     $('#x').onclick=()=>m.remove();
     $('#go').onclick=step2;
@@ -1126,7 +1142,7 @@ function openBooking(id){
           start:q.s, end:q.e, days:q.d,
           addons:q.adds, coupon:q.couponCode,
           base:q.base, weekly:q.weekly, couponAmt:q.coupon, addonAmt:q.addon,
-          gst:q.gst, total:q.total, payment:ref,
+          gst:q.gst, total:q.total, payment:ref, deliveryFee:q.delivery, deliveryAddr:q.addr,
           txn:'TXN'+Math.random().toString(36).slice(2,10).toUpperCase(),
           status:'confirmed', paidOn:new Date().toLocaleString('en-IN')
         };
@@ -1165,6 +1181,7 @@ function receipt(m,r){
       <div><span>Customer</span><span>${esc(r.userName)}</span></div>
       ${r.addons&&r.addons.length?`<div><span>Add-ons</span><span>${r.addons.map(a=>esc(ADDONS[a][0])).join(', ')}</span></div>`:''}
       ${r.couponAmt?`<div><span>Coupon (${esc(r.coupon)})</span><span>− ${inr(r.couponAmt)}</span></div>`:''}
+      ${r.deliveryFee?`<div><span>Doorstep delivery</span><span>${inr(r.deliveryFee)}</span></div><div><span>Deliver to</span><span style="text-align:right;max-width:60%">${esc(r.deliveryAddr)}</span></div>`:''}
       <div><span>GST @ 18%</span><span>${inr(r.gst)}</span></div>
       <div><span>Paid via</span><span>${esc(r.payment)}</span></div>
       <div><span>Transaction ID</span><span>${r.txn}</span></div>
